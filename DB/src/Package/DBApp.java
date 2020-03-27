@@ -54,7 +54,7 @@ public class DBApp {
   public Table loadTable(String tableName) throws DBAppException {
     Table table = new Table(tableName);
 
-    File myfile = new File("data/metadata.csv");
+    File myfile = new File("DB/data/metadata.csv");
     boolean tablefound = false; // to check if the table is already there
     BufferedReader reader = null;
     String line = "";
@@ -65,7 +65,7 @@ public class DBApp {
     List<Boolean> isindexed = new ArrayList<Boolean>();
     try {
       // next we need to check if the table is already there
-      reader = new BufferedReader(new FileReader("data/metadata.csv"));
+      reader = new BufferedReader(new FileReader("DB/data/metadata.csv"));
       while ((line = reader.readLine()) != null) {
         String[] data = line.split(cvsSplitBy);
 
@@ -215,14 +215,14 @@ public class DBApp {
 
   public void createTable(String strTableName, String strClusteringKeyColumn, Hashtable<String, String> htblColNameType)
       throws DBAppException, IOException {
-    File myfile = new File("data/metadata.csv");
+    File myfile = new File("DB/data/metadata.csv");
     boolean tablefound = false; // to check if the table is already there
     BufferedReader reader = null;
     String line = "";
     String cvsSplitBy = ",";
     try {
       // next we need to check if the table is already there
-      reader = new BufferedReader(new FileReader("data/metadata.csv"));
+      reader = new BufferedReader(new FileReader("DB/data/metadata.csv"));
       while ((line = reader.readLine()) != null) {
         String[] data = line.split(cvsSplitBy);
         if (data[0].equals(strTableName)) {
@@ -282,7 +282,8 @@ public class DBApp {
     // or leave it empty if there is no code you want to
     // execute at application startup
     // creates the metadata file if its not already there
-    File myfile = new File("data/metadata.csv");
+    System.out.println("Working Directory = " + System.getProperty("user.dir"));
+    File myfile = new File("DB/data/metadata.csv");
     if (myfile.createNewFile()) { // checking if the metadata file is there or not
       String s = "Table Name,Column Name,Column Type,Key,Indexed\n";
       BufferedWriter writer = new BufferedWriter(new FileWriter(myfile, true));
@@ -558,7 +559,7 @@ public class DBApp {
 
   // ---------------------------------------------------------------------------------------------------
   public static boolean canBTreeIndex(String tableName, String colName) throws DBAppException {
-    File oldFile = new File("data/metadata.csv");
+    File oldFile = new File("DB/data/metadata.csv");
     String tbname = "";
     String cname = "";
     String ctype = "";
@@ -621,7 +622,7 @@ public class DBApp {
   }
 
   public static boolean canRTreeIndex(String tableName, String colName) throws DBAppException {
-    File oldFile = new File("data/metadata.csv");
+    File oldFile = new File("DB/data/metadata.csv");
     String tbname = "";
     String cname = "";
     String ctype = "";
@@ -685,8 +686,8 @@ public class DBApp {
   }
 
   public static void csvIndex(String tableName, String colName) throws DBAppException {
-    String tempFile = "data/temp.csv";
-    File oldFile = new File("data/metadata.csv");
+    String tempFile = "DB/data/temp.csv";
+    File oldFile = new File("DB/data/metadata.csv");
     File newFile = new File(tempFile);
     String tbname = "";
     String cname = "";
@@ -729,7 +730,7 @@ public class DBApp {
       System.gc();
       oldFile.delete();
 
-      File dodo = new File("data/metadata.csv");
+      File dodo = new File("DB/data/metadata.csv");
 
       newFile.renameTo(dodo);
     } catch (Exception e) {

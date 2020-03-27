@@ -27,7 +27,7 @@ public class Page implements Serializable {
 
 		}
 
-		try (InputStream input = new FileInputStream("config/DBapp.properties")) {
+		try (InputStream input = new FileInputStream("DB/config/DBApp.properties")) {
 
 			Properties prop = new Properties();
 
