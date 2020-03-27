@@ -22,10 +22,11 @@ public class DBAppTest {
 		htblColNameValue.put("name", new String("miro"));
 		htblColNameValue.put("area", new String("(0,0),(0,0),(0,0),(0,0)"));
 		dbApp.insertIntoTable(strTableName, htblColNameValue);
-		// System.out.println( dbApp.canBTreeIndex("gay","area")); //hairaga3 true
+		// System.out.println( dbApp.canBTreeIndex("Table","area")); //hairaga3 true
 		dbApp.displayer(strTableName);
-		// dbApp.csvIndex("gay","area");//hai5alih indexed
-		// System.out.println( dbApp.canBTreeIndex("gay","area")); //hairaga3 exception
+		// dbApp.csvIndex("Table","area");//hai5alih indexed
+		// System.out.println( dbApp.canBTreeIndex("Table","area")); //hairaga3
+		// exception
 		// htblColNameValue.clear( );
 		// htblColNameValue.put("id", new Integer( 453455 ));
 		// htblColNameValue.put("name", new String("Ahmed Noor" ) );
