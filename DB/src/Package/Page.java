@@ -134,8 +134,11 @@ public class Page implements Serializable {
 
 	public void display() {
 		for (int i = 0; i < this.records.size(); i++) {
-
-			System.out.println(records.get(i).toString());
+			System.out.println(records.get(i));
+			if (records.get(i) instanceof Polygon)
+				System.out.println(((PolygonE) records.get(i)).toString());
+			else
+				System.out.println(records.get(i).toString());
 		}
 	}
 
@@ -164,17 +167,30 @@ public class Page implements Serializable {
 	}
 
 	private boolean SubCompare(Vector record, Vector Deleterecord) {
-		// System.out.println(record.toString());
-		// System.out.println(Deleterecord.toString());
-		if (!record.get(0).equals(Deleterecord.get(0)))
-			return false;
-
-		for (int i = 1; i < Deleterecord.size(); i++) {
-			if (Deleterecord.get(i) != null && !Deleterecord.get(i).equals(record.get(i)))
-				return false;
+		boolean flag = true;
+		if (record.get(0) instanceof Polygon && Deleterecord.get(0) instanceof Polygon) {
+			if (!((PolygonE) record.get(0)).equals((PolygonE) Deleterecord.get(0)))
+				flag = flag & false;
+		} else if (!record.get(0).equals(Deleterecord.get(0))) {
+			flag = flag & false;
 		}
-		return true;
-
+		for (int i = 1; i < Deleterecord.size(); i++) {
+			// if delete record has a value and this value is equal to the value of the
+			// record
+			// then this record will be deleted
+			if (record.get(i) instanceof Polygon && Deleterecord.get(i) instanceof Polygon
+					&& Deleterecord.get(i) != null
+					&& !((PolygonE) record.get(i)).equals((PolygonE) Deleterecord.get(i)))
+				flag = flag & false;
+		}
+		for (int i = 1; i < Deleterecord.size(); i++) {
+			// if delete record has a value and this value is equal to the value of the
+			// record
+			// then this record will be deleted
+			if (Deleterecord.get(i) != null && !Deleterecord.get(i).equals(record.get(i)))
+				flag = flag & false;
+		}
+		return flag;
 	}
 
 	public Vector RecordsGetter() {

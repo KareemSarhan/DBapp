@@ -147,8 +147,6 @@ public class Table implements Serializable {
 	public void removefromtable(Vector record) throws IOException, DBAppException {
 
 		for (int i = 0; i < this.pagesreferences.size(); i++) {
-			System.err.println(i);
-
 			Page page = this.read_page(this.pagesreferences.get(i));
 			System.err.println(page.delete(record));
 			if (page.RecordsGetter().isEmpty()) {

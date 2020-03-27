@@ -28,7 +28,7 @@ public class PolygonE extends Polygon implements Serializable {
         } else if (p1area < p2area) {
             n = false;
         }
-        // System.out.println(n);
+        System.out.println("polyeq   " + n);
         return n;
 
     }
