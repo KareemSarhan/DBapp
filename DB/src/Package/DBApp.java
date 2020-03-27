@@ -26,31 +26,30 @@ import java.util.Vector;
 @SuppressWarnings("all")
 /*
  * TO DOOOO 1-deleting empty pages after deleting records
- * 
+ *
  * 2-having a page counter attribute that only increases so that each time I
  * create a page it takes the number of the counter and increments the counter
  * and whenever a page is deleted the counter doesnt decrement it stays the
  * same.so that no pages with the same name will be created
- * 
- * 
+ *
+ *
  * 3-whenever u delete a page file u remove it from the array of page refrences
  * from the table
- * 
+ *
  * 4-use the polygonCompare method you can use it with two coordinate strings
  * that the user gives u or u can use it with 2 polygons u already have if it
  * returns 1 first poly is bigger if it returns 0 they are equal if it returns
  * -1 2nd poly is bigger
- * 
+ *
  * 5-make sure any record we try to insert is inserted and no system.out.print
  * commands are active and all exceptions are handled wth DBAPP exception
- * 
- * 
- * 
+ *
+ *
+ *
  */
 public class DBApp {
 
-  public DBApp() {
-  }
+  public DBApp() {}
 
   public Table loadTable(String tableName) throws DBAppException {
     Table table = new Table(tableName);
@@ -75,14 +74,10 @@ public class DBApp {
           // System.out.println("Table already exists");
           coloumn_names.add(data[1]);
           datatype.add(data[2]);
-          if (data[3].equals("False"))
-            iskey.add(false);
-          else
-            iskey.add(true);
-          if (data[4].equals("False"))
-            isindexed.add(false);
-          else
-            isindexed.add(true);
+          if (data[3].equals("False")) iskey.add(false); else iskey.add(true);
+          if (data[4].equals("False")) isindexed.add(false); else isindexed.add(
+            true
+          );
           tablefound = true;
         }
       }
@@ -158,7 +153,11 @@ public class DBApp {
   // done
   // takes a table and hash table and checks that the fields are correct
   /////////////////////////////////////////////////
-  public boolean missorins(Table table, Hashtable<String, Object> htblColNameValue) throws DBAppException {
+  public boolean missorins(
+    Table table,
+    Hashtable<String, Object> htblColNameValue
+  )
+    throws DBAppException {
     for (int i = 0; i < table.getColoumn_names().size() - 1; i++) {
       Object o = htblColNameValue.get(table.getColoumn_names().get(i));
 
@@ -175,15 +174,14 @@ public class DBApp {
     return false;
   }
 
-  public boolean inCons(Table table, Hashtable<String, Object> t) throws DBAppException {
+  public boolean inCons(Table table, Hashtable<String, Object> t)
+    throws DBAppException {
     for (int i = 0; i < table.getColoumn_names().size(); i++) {
       Object o = t.get(table.getColoumn_names().get(i));
       String datatype = (table.getDatatype().get(i));
       // System.out.println(o+" "+datatype);
-      if (o == null)
-        continue;
-      if (check(o, datatype) == false)
-        return true;
+      if (o == null) continue;
+      if (check(o, datatype) == false) return true;
     }
     return false;
   }
@@ -195,7 +193,9 @@ public class DBApp {
     Vector result = new Vector();
     try {
       // System.out.println("testo.txt");
-      ObjectInputStream o = new ObjectInputStream(new FileInputStream(tblname + ".bin"));
+      ObjectInputStream o = new ObjectInputStream(
+        new FileInputStream(tblname + ".bin")
+      );
       Table foo2 = (Table) o.readObject();
       // System.out.print(foo2.getPagesreferences().get(0));
       o.close();
@@ -214,10 +214,12 @@ public class DBApp {
     ////////////////////////////////////////////// main methods
   }
 
-  public void createTable(String strTableName, String strClusteringKeyColumn, Hashtable<String, String> htblColNameType)
-      throws DBAppException, IOException
-
-  {
+  public void createTable(
+    String strTableName,
+    String strClusteringKeyColumn,
+    Hashtable<String, String> htblColNameType
+  )
+    throws DBAppException, IOException {
     File myfile = new File("data/metadata.csv");
     boolean tablefound = false; // to check if the table is already there
     BufferedReader reader = null;
@@ -241,28 +243,51 @@ public class DBApp {
         // we need to know which one is the primary key of the table
         // we need to know if its indexed or not(by default they are all not indexed
         // will use this to iterate through hash map D:
-        BufferedWriter writer = new BufferedWriter(new FileWriter(myfile, true));
+        BufferedWriter writer = new BufferedWriter(
+          new FileWriter(myfile, true)
+        );
         // first we will add the cluster key
         String keyName = strClusteringKeyColumn;
         String keyType = htblColNameType.get(keyName);
-        String ki = strTableName + "," + keyName + "," + keyType + "," + "True" + "," + "False" + "\n";
+        String ki =
+          strTableName +
+          "," +
+          keyName +
+          "," +
+          keyType +
+          "," +
+          "True" +
+          "," +
+          "False" +
+          "\n";
         writer.write(ki);
         htblColNameType.remove(strClusteringKeyColumn);
         Iterator i = htblColNameType.entrySet().iterator();
         while (i.hasNext()) {
           Map.Entry mapElement = (Map.Entry) i.next();
           String colName = (String) mapElement.getKey(); // id,name,last name
-          String colType = (String) mapElement.getValue();// integer string double we keda
+          String colType = (String) mapElement.getValue(); // integer string double we keda
           String key = "False";
-          if (colName.equals(strClusteringKeyColumn))
-            key = "True";
-          String s = strTableName + "," + colName + "," + colType + "," + key + "," + "False" + "\n";
+          if (colName.equals(strClusteringKeyColumn)) key = "True";
+          String s =
+            strTableName +
+            "," +
+            colName +
+            "," +
+            colType +
+            "," +
+            key +
+            "," +
+            "False" +
+            "\n";
           writer.write(s);
         }
-        writer.write(strTableName + ",TouchDate,java.util.Date,False,False" + "\n");
+        writer.write(
+          strTableName + ",TouchDate,java.util.Date,False,False" + "\n"
+        );
         writer.flush();
         writer.close();
-      } else {// if table is already there
+      } else { // if table is already there
         throw (new DBAppException("table already exists"));
       }
     } catch (FileNotFoundException e) {
@@ -295,14 +320,17 @@ public class DBApp {
     }
   }
 
-  public void createBTreeIndex(String strTableName, String strColName) throws DBAppException {
-  }
+  public void createBTreeIndex(String strTableName, String strColName)
+    throws DBAppException {}
 
-  public void createRTreeIndex(String strTableName, String strColName) throws DBAppException {
-  }
+  public void createRTreeIndex(String strTableName, String strColName)
+    throws DBAppException {}
 
-  public void insertIntoTable(String tablename, Hashtable<String, Object> htblColNameValue)
-      throws DBAppException, IOException {
+  public void insertIntoTable(
+    String tablename,
+    Hashtable<String, Object> htblColNameValue
+  )
+    throws DBAppException, IOException {
     Table table = this.loadTable(tablename);
     Vector rest = this.deserilizetable(tablename);
     table.setPagesreferences((List<String>) rest.get(0));
@@ -314,8 +342,13 @@ public class DBApp {
       Vector record = new Vector();
       for (int i = 0; i < table.getIskey().size(); i++) {
         if (table.getIskey().get(i) == true) {
-          if (((String) table.getDatatype().get(i)).equals("java.awt.Polygon")) {
-            Polygon temp = this.makePolygon((String) htblColNameValue.get(table.getColoumn_names().get(i)));
+          if (
+            ((String) table.getDatatype().get(i)).equals("java.awt.Polygon")
+          ) {
+            Polygon temp =
+              this.makePolygon(
+                  (String) htblColNameValue.get(table.getColoumn_names().get(i))
+                );
             record.add(temp);
           } else {
             record.add(htblColNameValue.get(table.getColoumn_names().get(i)));
@@ -327,7 +360,10 @@ public class DBApp {
       for (int i = 0; i < table.getIskey().size() - 1; i++) {
         if (table.getIskey().get(i) == false) {
           if (table.getDatatype().get(i) == "java.awt.Polygon") {
-            Polygon temp = this.makePolygon((String) htblColNameValue.get(table.getColoumn_names().get(i)));
+            Polygon temp =
+              this.makePolygon(
+                  (String) htblColNameValue.get(table.getColoumn_names().get(i))
+                );
             record.add(temp);
           } else {
             record.add(htblColNameValue.get(table.getColoumn_names().get(i)));
@@ -352,7 +388,9 @@ public class DBApp {
   public static List<String> deserilizetableOLD(String tblname) {
     try {
       // System.out.println("testo.txt");
-      ObjectInputStream o = new ObjectInputStream(new FileInputStream(tblname + ".bin"));
+      ObjectInputStream o = new ObjectInputStream(
+        new FileInputStream(tblname + ".bin")
+      );
       Table foo2 = (Table) o.readObject();
       // System.out.print(foo2.getPagesreferences().get(0));
       o.close();
@@ -365,8 +403,12 @@ public class DBApp {
     }
   }
 
-  public void updateTable(String strTableName, String strKey, Hashtable<String, Object> htblColNameValue)
-      throws DBAppException, IOException {
+  public void updateTable(
+    String strTableName,
+    String strKey,
+    Hashtable<String, Object> htblColNameValue
+  )
+    throws DBAppException, IOException {
     Table table = this.loadTable(strTableName);
     table.setPagesreferences(this.deserilizetable(strTableName));
     // first we check that the data entered in the hash table is consistent
@@ -381,7 +423,10 @@ public class DBApp {
       Hashtable<String, Object> tempT = new Hashtable();
       for (int i = 0; i < table.getColoumn_names().size(); i++) {
         if (htblColNameValue.containsKey(table.getColoumn_names().get(i))) {
-          tempT.put(table.getColoumn_names().get(i), htblColNameValue.get(table.getColoumn_names().get(i)));
+          tempT.put(
+            table.getColoumn_names().get(i),
+            htblColNameValue.get(table.getColoumn_names().get(i))
+          );
         } else {
           tempT.put(table.getColoumn_names().get(i), "");
         }
@@ -445,8 +490,11 @@ public class DBApp {
     }
   }
 
-  public void deleteFromTable(String tablename, Hashtable<String, Object> htblColNameValue)
-      throws DBAppException, IOException {
+  public void deleteFromTable(
+    String tablename,
+    Hashtable<String, Object> htblColNameValue
+  )
+    throws DBAppException, IOException {
     // gets the table object from metadata
     Table table = this.loadTable(tablename);
     table.setPagesreferences(this.deserilizetableOLD(tablename));
@@ -486,12 +534,12 @@ public class DBApp {
     }
 
     for (int i = 0; i < table.getPagesreferences().size(); i++) {
-
-      Page page = (Page) table.read_page((String) (table.getPagesreferences().get(i)));
+      Page page = (Page) table.read_page(
+        (String) (table.getPagesreferences().get(i))
+      );
 
       page.display();
     }
-
   }
 
   public static Polygon makePolygon(String s) throws DBAppException {
@@ -562,7 +610,8 @@ public class DBApp {
   }
 
   // ---------------------------------------------------------------------------------------------------
-  public static boolean canBTreeIndex(String tableName, String colName) throws DBAppException {
+  public static boolean canBTreeIndex(String tableName, String colName)
+    throws DBAppException {
     File oldFile = new File("data/metadata.csv");
     String tbname = "";
     String cname = "";
@@ -584,16 +633,15 @@ public class DBApp {
         ctype = x.next();
         iskey = x.next();
         isIndexed = x.next();
-        bobo = tbname + " " + cname + " " + ctype + " " + iskey + " " + isIndexed;
+        bobo =
+          tbname + " " + cname + " " + ctype + " " + iskey + " " + isIndexed;
         // System.out.println(bobo);
 
         if (tbname.equals(tableName)) {
           tablefound = true;
           if (cname.equals(colName)) {
             colfound = true;
-            if (ctype.equals("java.util.Polygon"))
-              wrongIndex = true;
-            else {
+            if (ctype.equals("java.util.Polygon")) wrongIndex = true; else {
               if (isIndexed.contentEquals("False")) {
                 return true;
               } else {
@@ -613,19 +661,21 @@ public class DBApp {
     if (tablefound == false) {
       throw new DBAppException("Table you are trying to index doesnt exist");
     } else {
-      if (colfound == false)
-        throw new DBAppException("Column you are trying to index doesnt exist");
-      else {
-        if (wrongIndex)
-          throw new DBAppException("Cannot BTree index a Polygon type");
-        else if (alreadyIndexed)
-          throw new DBAppException("Column " + colName + " is already indexed");
+      if (colfound == false) throw new DBAppException(
+        "Column you are trying to index doesnt exist"
+      ); else {
+        if (wrongIndex) throw new DBAppException(
+          "Cannot BTree index a Polygon type"
+        ); else if (alreadyIndexed) throw new DBAppException(
+          "Column " + colName + " is already indexed"
+        );
       }
     }
     return false;
   }
 
-  public static boolean canRTreeIndex(String tableName, String colName) throws DBAppException {
+  public static boolean canRTreeIndex(String tableName, String colName)
+    throws DBAppException {
     File oldFile = new File("data/metadata.csv");
     String tbname = "";
     String cname = "";
@@ -647,16 +697,15 @@ public class DBApp {
         ctype = x.next();
         iskey = x.next();
         isIndexed = x.next();
-        bobo = tbname + " " + cname + " " + ctype + " " + iskey + " " + isIndexed;
+        bobo =
+          tbname + " " + cname + " " + ctype + " " + iskey + " " + isIndexed;
         // System.out.println(bobo);
 
         if (tbname.equals(tableName)) {
           tablefound = true;
           if (cname.equals(colName)) {
             colfound = true;
-            if (!ctype.equals("java.util.Polygon"))
-              wrongIndex = true;
-            else {
+            if (!ctype.equals("java.util.Polygon")) wrongIndex = true; else {
               if (isIndexed.contentEquals("False")) {
                 return true;
               } else {
@@ -676,20 +725,22 @@ public class DBApp {
     if (tablefound == false) {
       throw new DBAppException("Table you are trying to index doesnt exist");
     } else {
-      if (colfound == false)
-        throw new DBAppException("Column you are trying to index doesnt exist");
-      else {
-        if (wrongIndex)
-          throw new DBAppException("Cannot RTree index except Polygon type");
-        else if (alreadyIndexed)
-          throw new DBAppException("Column " + colName + " is already indexed");
+      if (colfound == false) throw new DBAppException(
+        "Column you are trying to index doesnt exist"
+      ); else {
+        if (wrongIndex) throw new DBAppException(
+          "Cannot RTree index except Polygon type"
+        ); else if (alreadyIndexed) throw new DBAppException(
+          "Column " + colName + " is already indexed"
+        );
       }
     }
 
     return false;
   }
 
-  public static void csvIndex(String tableName, String colName) throws DBAppException {
+  public static void csvIndex(String tableName, String colName)
+    throws DBAppException {
     String tempFile = "data/temp.csv";
     File oldFile = new File("data/metadata.csv");
     File newFile = new File(tempFile);
@@ -716,13 +767,36 @@ public class DBApp {
         ctype = x.next();
         iskey = x.next();
         isIndexed = x.next();
-        bobo = tbname + " " + cname + " " + ctype + " " + iskey + " " + isIndexed;
+        bobo =
+          tbname + " " + cname + " " + ctype + " " + iskey + " " + isIndexed;
         // System.out.println(bobo);
 
         if (tbname.equals(tableName) && cname.equals(colName)) {
-          pw.write(tbname + "," + cname + "," + ctype + "," + iskey + "," + "True" + "\n");
+          pw.write(
+            tbname +
+            "," +
+            cname +
+            "," +
+            ctype +
+            "," +
+            iskey +
+            "," +
+            "True" +
+            "\n"
+          );
         } else {
-          pw.write(tbname + "," + cname + "," + ctype + "," + iskey + "," + isIndexed + "\n");
+          pw.write(
+            tbname +
+            "," +
+            cname +
+            "," +
+            ctype +
+            "," +
+            iskey +
+            "," +
+            isIndexed +
+            "\n"
+          );
         }
       }
       x.close();

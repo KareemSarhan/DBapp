@@ -9,7 +9,7 @@ public class DBAppTest {
 
 	public static void main(String[] args) throws IOException, DBAppException {
 
-		String strTableName = "gay";
+		String strTableName = "Table";
 		DBApp dbApp = new DBApp();
 		dbApp.init();
 		Hashtable htblColNameType = new Hashtable();
@@ -23,7 +23,7 @@ public class DBAppTest {
 		htblColNameValue.put("area", new String("(0,0),(0,0),(0,0),(0,0)"));
 		dbApp.insertIntoTable(strTableName, htblColNameValue);
 		// System.out.println( dbApp.canBTreeIndex("gay","area")); //hairaga3 true
-		dbApp.displayer("gay");
+		dbApp.displayer(strTableName);
 		// dbApp.csvIndex("gay","area");//hai5alih indexed
 		// System.out.println( dbApp.canBTreeIndex("gay","area")); //hairaga3 exception
 		// htblColNameValue.clear( );
