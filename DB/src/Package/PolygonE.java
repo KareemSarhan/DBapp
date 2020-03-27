@@ -1,4 +1,3 @@
-package Package;
 
 import java.awt.Dimension;
 import java.awt.Polygon;

@@ -1,4 +1,3 @@
-package Package;
 
 @SuppressWarnings("serial")
 public class DBAppException extends Exception {

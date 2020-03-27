@@ -1,4 +1,3 @@
-package Package;
 
 import java.io.IOException;
 import java.util.Hashtable;

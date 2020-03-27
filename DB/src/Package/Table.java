@@ -1,4 +1,3 @@
-package Package;
 
 import java.awt.Polygon;
 import java.beans.Transient;
