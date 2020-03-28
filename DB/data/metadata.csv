@@ -1,0 +1,4 @@
+Table,area,java.awt.Polygon,True,False
+Table,name,java.lang.String,False,False
+Table,id,java.lang.Integer,False,False
+Table,TouchDate,java.util.Date,False,False
