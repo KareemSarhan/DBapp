@@ -1,4 +1,5 @@
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Hashtable;
 
@@ -20,15 +21,20 @@ public class DBAppTest {
 		htblColNameValue.put("id", new Integer(2343432));
 		htblColNameValue.put("name", new String("miro"));
 		htblColNameValue.put("area", new String("(0,0),(0,0),(0,0),(0,0)"));
-		// dbApp.insertIntoTable(strTableName, htblColNameValue);
+		dbApp.insertIntoTable(strTableName, htblColNameValue);
 		dbApp.displayer(strTableName);
 
 		dbApp.deleteFromTable(strTableName, htblColNameValue);
-		// System.out.println( dbApp.canBTreeIndex("Table","area")); //hairaga3 true
-		dbApp.displayer(strTableName);
-		dbApp.displayer(strTableName);
+
 
 		dbApp.displayer(strTableName);
+
+		// dbApp.deleteFromTable(strTableName, htblColNameValue);
+		// System.out.println( dbApp.canBTreeIndex("Table","area")); //hairaga3 true
+		// dbApp.displayer(strTableName);
+		// dbApp.displayer(strTableName);
+
+		// dbApp.displayer(strTableName);
 
 		// dbApp.csvIndex("Table","area");//hai5alih indexed
 		// System.out.println( dbApp.canBTreeIndex("Table","area")); //hairaga3

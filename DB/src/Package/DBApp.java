@@ -15,14 +15,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
-//import java.util.Iterator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Vector;
 
-@SuppressWarnings("all")
+// @SuppressWarnings("all")
 /*
  * TO DOOOO 1-deleting empty pages after deleting records
  *
@@ -46,6 +45,8 @@ import java.util.Vector;
  *
  *
  */
+@SuppressWarnings("all")
+
 public class DBApp {
 
   public DBApp() {
@@ -93,14 +94,16 @@ public class DBApp {
         table.setIsindexed(isindexed);
         table.setIskey(iskey);
       } else {
+        reader.close();
         throw (new DBAppException("Table doesnt exist"));
       }
+      reader.close();
+
     } catch (FileNotFoundException e) {
       throw new DBAppException("");
     } catch (IOException e) {
       throw new DBAppException("");
     }
-
     return table;
   }
 
@@ -148,7 +151,7 @@ public class DBApp {
         return false;
       }
     } else {
-      this.makePolygon((String) data);
+      DBApp.makePolygon((String) data);
       return true;
     }
   }
@@ -469,7 +472,7 @@ public class DBApp {
       for (int i = 0; i < table.getIskey().size() - 1; i++) {
         if (table.getIskey().get(i) == false) {
           if (table.getDatatype().get(i) == "java.awt.Polygon") {
-            PolygonE temp = this.makePolygon((String) htblColNameValue.get(table.getColoumn_names().get(i)));
+            PolygonE temp = DBApp.makePolygon((String) htblColNameValue.get(table.getColoumn_names().get(i)));
             record.add(temp);
           } else {
             record.add(htblColNameValue.get(table.getColoumn_names().get(i)));
@@ -480,9 +483,14 @@ public class DBApp {
       Date date = new Date();
 
       record.add(formatter.format(date) + "");
-      table.removefromtable(record);
+      Vector out = table.removefromtable(record);
+      for (int i = 0; i < out.size(); i++) {
+        File F = new File(out.get(i) + "");
+        System.out.println("FILE GOT DELETED = " + F.delete());
+      }
       // System.out.print(table.getPagesreferences());
     }
+
   }
 
   public String Gettime() {
