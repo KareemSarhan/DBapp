@@ -445,27 +445,44 @@ public class DBApp {
 
   public void deleteFromTable(String tablename, Hashtable<String, Object> htblColNameValue)
       throws DBAppException, IOException {
-    // gets the table object from metadata
     Table table = this.loadTable(tablename);
-    table.setPagesreferences(this.deserilizetableOLD(tablename));
-
-    Vector record = new Vector();
-    for (int i = 0; i < table.getIskey().size() - 1; i++) {
-      if (table.getIskey().get(i) == true) {
-        record.add(htblColNameValue.get(table.getColoumn_names().get(i)));
-        // System.err.println(record);
-        break;
+    Vector rest = this.deserilizetable(tablename);
+    table.setPagesreferences((List<String>) rest.get(0));
+    table.setNumofcreatedpages((int) rest.get(1));
+    if (this.missorins(table, htblColNameValue) == true) {
+      throw (new DBAppException("missing or inconsisitant data"));
+    } else {
+      // System.out.println("done");
+      Vector record = new Vector();
+      for (int i = 0; i < table.getIskey().size(); i++) {
+        if (table.getIskey().get(i) == true) {
+          if (((String) table.getDatatype().get(i)).equals("java.awt.Polygon")) {
+            PolygonE temp = this.makePolygon((String) htblColNameValue.get(table.getColoumn_names().get(i)));
+            record.add(temp);
+          } else {
+            record.add(htblColNameValue.get(table.getColoumn_names().get(i)));
+            // System.out.println(record);
+          }
+          break;
+        }
       }
-    }
-    for (int i = 0; i < table.getIskey().size() - 1; i++) {
-      if (table.getIskey().get(i) == false) {
-        record.add(htblColNameValue.get(table.getColoumn_names().get(i)));
-        // break;
+      for (int i = 0; i < table.getIskey().size() - 1; i++) {
+        if (table.getIskey().get(i) == false) {
+          if (table.getDatatype().get(i) == "java.awt.Polygon") {
+            PolygonE temp = this.makePolygon((String) htblColNameValue.get(table.getColoumn_names().get(i)));
+            record.add(temp);
+          } else {
+            record.add(htblColNameValue.get(table.getColoumn_names().get(i)));
+          }
+        }
       }
-    }
-    record.add(Gettime());
+      SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+      Date date = new Date();
 
-    table.removefromtable(record);
+      record.add(formatter.format(date) + "");
+      table.removefromtable(record);
+      // System.out.print(table.getPagesreferences());
+    }
   }
 
   public String Gettime() {
