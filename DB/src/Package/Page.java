@@ -135,7 +135,7 @@ public class Page implements Serializable {
 	public void display() {
 		for (int i = 0; i < this.records.size(); i++) {
 			System.out.println(records.get(i));
-			if (records.get(i) instanceof Polygon)
+			if (records.get(i) instanceof PolygonE)
 				System.out.println(((PolygonE) records.get(i)).toString());
 			else
 				System.out.println(records.get(i).toString());
@@ -168,7 +168,8 @@ public class Page implements Serializable {
 
 	private boolean SubCompare(Vector record, Vector Deleterecord) {
 		boolean flag = true;
-		if (record.get(0) instanceof Polygon && Deleterecord.get(0) instanceof Polygon) {
+		System.out.println("ins of :" + (record.get(0) instanceof PolygonE));
+		if ((record.get(0) instanceof PolygonE) && (Deleterecord.get(0) instanceof PolygonE)) {
 			if (!((PolygonE) record.get(0)).equals((PolygonE) Deleterecord.get(0)))
 				flag = flag & false;
 		} else if (!record.get(0).equals(Deleterecord.get(0))) {
@@ -178,7 +179,7 @@ public class Page implements Serializable {
 			// if delete record has a value and this value is equal to the value of the
 			// record
 			// then this record will be deleted
-			if (record.get(i) instanceof Polygon && Deleterecord.get(i) instanceof Polygon
+			if (record.get(i) instanceof PolygonE && Deleterecord.get(i) instanceof PolygonE
 					&& Deleterecord.get(i) != null
 					&& !((PolygonE) record.get(i)).equals((PolygonE) Deleterecord.get(i)))
 				flag = flag & false;
@@ -225,7 +226,7 @@ public class Page implements Serializable {
 			}
 			return false;
 		} else {
-			int n = polygonCompare((Polygon) x, (Polygon) y);
+			int n = polygonCompare((PolygonE) x, (PolygonE) y);
 			if (n <= 0) {
 				return true;
 			}
@@ -233,7 +234,7 @@ public class Page implements Serializable {
 		}
 	}
 
-	public static int polygonCompare(Polygon p1, Polygon p2) {
+	public static int polygonCompare(PolygonE p1, PolygonE p2) {
 		// if the first polygon is bigger it returns 1;
 		// if the 2nd polygon is bigger it returns -1
 		// if they are equal it returns 0

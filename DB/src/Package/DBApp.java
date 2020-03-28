@@ -313,7 +313,7 @@ public class DBApp {
       for (int i = 0; i < table.getIskey().size(); i++) {
         if (table.getIskey().get(i) == true) {
           if (((String) table.getDatatype().get(i)).equals("java.awt.Polygon")) {
-            Polygon temp = this.makePolygon((String) htblColNameValue.get(table.getColoumn_names().get(i)));
+            PolygonE temp = this.makePolygon((String) htblColNameValue.get(table.getColoumn_names().get(i)));
             record.add(temp);
           } else {
             record.add(htblColNameValue.get(table.getColoumn_names().get(i)));
@@ -325,7 +325,7 @@ public class DBApp {
       for (int i = 0; i < table.getIskey().size() - 1; i++) {
         if (table.getIskey().get(i) == false) {
           if (table.getDatatype().get(i) == "java.awt.Polygon") {
-            Polygon temp = this.makePolygon((String) htblColNameValue.get(table.getColoumn_names().get(i)));
+            PolygonE temp = this.makePolygon((String) htblColNameValue.get(table.getColoumn_names().get(i)));
             record.add(temp);
           } else {
             record.add(htblColNameValue.get(table.getColoumn_names().get(i)));
@@ -490,10 +490,10 @@ public class DBApp {
     }
   }
 
-  public static Polygon makePolygon(String s) throws DBAppException {
+  public static PolygonE makePolygon(String s) throws DBAppException {
     // this method takes the input string from the user
     // and parses the string into polygon and returns the poly
-    Polygon p = new Polygon();
+    PolygonE p = new PolygonE();
     s = s.replace("(", "");
     s = s.replace(")", "");
     String[] points = s.split(",");
