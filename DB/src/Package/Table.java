@@ -2,7 +2,12 @@
 import java.awt.Polygon;
 import java.beans.Transient;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @SuppressWarnings("all")
 
@@ -144,54 +149,56 @@ public class Table implements Serializable {
 		return null;
 	}
 
-	public void removefromtable(Vector record) throws IOException, DBAppException {
-
+	public Vector removefromtable(Vector record) throws IOException, DBAppException {
+		this.update();
+		Vector out = new Vector<String>();
 		for (int i = 0; i < this.pagesreferences.size(); i++) {
 			Page page = this.read_page(this.pagesreferences.get(i));
 			System.err.println(page.delete(record));
+
 			if (page.RecordsGetter().isEmpty()) {
+				out.add(page.getPath());
 				this.pagesreferences.remove(i);
-				i--;
 			}
 		}
-
-		// System.out.println("Deleted");
 		this.update();
+
+		return out;
 	}
 
-	public static void main(String[] args) throws IOException, DBAppException {
-		//// Table t=new Table("final");
-		////
-		//// Vector r=new Vector();
-		//// Polygon p=new Polygon();
-		//// p.addPoint(0, 0);
-		//// p.addPoint(0, 5);
-		//// p.addPoint(5, 0);
-		//// p.addPoint(5, 5);
-		//// r.add(p);
-		//// t.inserttotable(r);
-		//
-		// try {
-		// ObjectInputStream o;
-		// o = new ObjectInputStream( new FileInputStream("final.bin"));
-		// Table p1 = (Table) o.readObject();
-		// // System.out.print(p1.getPath());
-		// Vector r=new Vector();
-		// Polygon p=new Polygon();
-		// p.addPoint(0, 0);
-		// p.addPoint(0, 500);
-		// p.addPoint(500, 0);
-		// p.addPoint(500, 500);
-		// r.add(p);
-		// r.add(3);
-		// p1.inserttotable(r);
-		//
-		//
-		// } catch (Exception e) {
-		//
-		// e.printStackTrace();
-		// }
-		// Page p=read_page("gay0.bin");
-		// p.display();
-	}
+	// public static void main(String[] args) throws IOException, DBAppException {
+	//// Table t=new Table("final");
+	////
+	//// Vector r=new Vector();
+	//// Polygon p=new Polygon();
+	//// p.addPoint(0, 0);
+	//// p.addPoint(0, 5);
+	//// p.addPoint(5, 0);
+	//// p.addPoint(5, 5);
+	//// r.add(p);
+	//// t.inserttotable(r);
+	//
+	// try {
+	// ObjectInputStream o;
+	// o = new ObjectInputStream( new FileInputStream("final.bin"));
+	// Table p1 = (Table) o.readObject();
+	// // System.out.print(p1.getPath());
+	// Vector r=new Vector();
+	// Polygon p=new Polygon();
+	// p.addPoint(0, 0);
+	// p.addPoint(0, 500);
+	// p.addPoint(500, 0);
+	// p.addPoint(500, 500);
+	// r.add(p);
+	// r.add(3);
+	// p1.inserttotable(r);
+	//
+	//
+	// } catch (Exception e) {
+	//
+	// e.printStackTrace();
+	// }
+	// Page p=read_page("gay0.bin");
+	// p.display();
+	// }
 }

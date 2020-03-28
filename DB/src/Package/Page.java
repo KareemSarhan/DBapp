@@ -134,7 +134,6 @@ public class Page implements Serializable {
 
 	public void display() {
 		for (int i = 0; i < this.records.size(); i++) {
-			System.out.println(records.get(i));
 			if (records.get(i) instanceof PolygonE)
 				System.out.println(((PolygonE) records.get(i)).toString());
 			else
