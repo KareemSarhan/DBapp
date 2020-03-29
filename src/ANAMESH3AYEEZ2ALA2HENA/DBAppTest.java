@@ -9,15 +9,15 @@ import java.util.Hashtable;
 public class DBAppTest {
 
 	public static void main(String[] args) throws IOException, DBAppException {
-
+		System.out.println("balabizo");
 		String strTableName = "test";
 		DBApp dbApp = new DBApp();
 		dbApp.init();
-		Hashtable htblColNameType = new Hashtable();
+		/*Hashtable htblColNameType = new Hashtable();
 		htblColNameType.put("id", "java.lang.Integer");
 		htblColNameType.put("name", "java.lang.String");
 		htblColNameType.put("area", "java.awt.Polygon");
-		dbApp.createTable(strTableName, "name", htblColNameType);
+		dbApp.createTable(strTableName, "name", htblColNameType);*/
 
 		Hashtable htblColNameValue = new Hashtable();
 		htblColNameValue.put("id", new Integer(3));
