@@ -1,6 +1,5 @@
-package DB.src.Package;
+package src.Package;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Hashtable;
 
@@ -26,7 +25,6 @@ public class DBAppTest {
 		dbApp.displayer(strTableName);
 
 		dbApp.deleteFromTable(strTableName, htblColNameValue);
-
 
 		dbApp.displayer(strTableName);
 

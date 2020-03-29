@@ -1,4 +1,4 @@
-package DB.src.Package;
+package src.Package;
 
 @SuppressWarnings("serial")
 public class DBAppException extends Exception {

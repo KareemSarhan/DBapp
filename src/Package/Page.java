@@ -1,10 +1,18 @@
-package DB.src.Package;
+package src.Package;
 
 import java.awt.Dimension;
-import java.awt.Polygon;
-import java.io.*;
-import java.util.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
+import java.util.Properties;
+import java.util.Vector;
 
 @SuppressWarnings("all")
 
