@@ -1,18 +1,9 @@
 package ANAMESH3AYEEZ2ALA2HENA;
 
 import java.awt.Dimension;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.util.Date;
-import java.util.Properties;
-import java.util.Vector;
+import java.awt.Polygon;
+import java.io.*;
+import java.util.*;
 
 @SuppressWarnings("all")
 
@@ -36,7 +27,7 @@ public class Page implements Serializable {
 
 		}
 
-		try (InputStream input = new FileInputStream("DB/config/DBApp.properties")) {
+		try (InputStream input = new FileInputStream("config/DBApp.properties")) {
 
 			Properties prop = new Properties();
 
@@ -143,10 +134,22 @@ public class Page implements Serializable {
 
 	public void display() {
 		for (int i = 0; i < this.records.size(); i++) {
-			if (records.get(i) instanceof PolygonE)
-				System.out.println(((PolygonE) records.get(i)).toString());
-			else
-				System.out.println(records.get(i).toString());
+			Vector temp = (Vector) this.records.get(i);
+			System.out.print("[");
+			for (int j = 0; j < temp.size(); j++) {
+				// System.out.println(i);
+				if (temp.get(j) instanceof Polygon) {
+					System.out.print("[");
+					Polygon currentR = (Polygon) temp.get(j);
+					for (int k = 0; k < currentR.npoints; k++) {
+						System.out.print("(" + currentR.xpoints[k] + "," + currentR.ypoints[k] + ") ");
+					}
+					System.out.print("], ");
+				} else
+					System.out.print(temp.get(j) + " , ");
+			}
+			System.out.print("]");
+			System.out.println("");
 		}
 	}
 
