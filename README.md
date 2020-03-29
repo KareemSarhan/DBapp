@@ -1,2 +1,0 @@
-# DBapp
-DataBase project
