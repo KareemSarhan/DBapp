@@ -822,6 +822,7 @@ public class DBApp {
   }
 
   public static void csvIndex(String tableName, String colName) throws DBAppException {
+	 // TODO: Fix the temp file problem (Bassel:reminder for me)
     String tempFile = "data/temp.csv";
     File oldFile = new File("data/metadata.csv");
     File newFile = new File(tempFile);
@@ -873,4 +874,503 @@ public class DBApp {
       throw new DBAppException("Indexing error");
     }
   }
+
+  
+
+  @SuppressWarnings({ "rawtypes", "unused" })
+	public static Vector binarySelect(int keyIndex,Vector page,Object value,Vector<Vector<?>> records,String operator) throws DBAppException {
+		// el method momken teban kebira awi fel awel bas heits its barely the same code repeated ketir
+		//nafs el code repeated ma3 e5telaf el operators 3ashan <,>,>=,<=,=
+		//fa dont worry its just repetitive badal ma3mel method le kol operator
+		
+		
+		int first=0;
+		int last=page.size()-1;
+		int mid=(first+last)/2;
+		boolean found =false;
+		boolean right=false;
+		boolean left=false;
+		page.size();
+		
+		
+		if(operator.equals("=")) {
+		while(first<=last) {
+			Vector record=(Vector)page.get(mid);
+			Object midValue=record.get(keyIndex);
+			if(comparer(record.get(keyIndex), value)<0) {
+				first=mid+1;
+			}else if(comparer(record.get(keyIndex), value)==0) {
+				found=true;
+				records.add(record);
+				break;
+			}else {
+				last=mid-1;
+			}
+			mid=(first+last)/2;
+			
+		}
+		if(found) {
+		int moveright=mid+1;
+		int moveleft=mid-1;
+		Vector record=(Vector)page.get(mid);
+		if(moveright<page.size())
+			record=(Vector)page.get(moveright);
+		while(comparer(record.get(keyIndex), value)==0&&moveright<page.size()) {
+			records.add(record);
+			moveright=moveright+1;
+			if(moveright<page.size())
+				record=(Vector)page.get(moveright);
+		}
+		
+		if(moveleft>-1)
+			record=(Vector)page.get(moveleft);
+		while(comparer(record.get(keyIndex), value)==0&&moveleft>-1) {
+			records.add(record);
+			moveleft=moveleft-1;
+			if(moveleft>-1)
+				record=(Vector)page.get(moveleft);
+		}
+		
+		
+		
+		}
+		
+		
+		}
+		
+		if(operator.equals(">")) {
+			while(first<=last) {
+				Vector record=(Vector)page.get(mid);
+				Object midValue=record.get(keyIndex);
+				if(comparer(record.get(keyIndex), value)<0) {
+					first=mid+1;
+				}else if(comparer(record.get(keyIndex), value)>0) {
+					found=true;
+					records.add(record);
+					break;
+				}else {
+					last=mid-1;
+				}
+				mid=(first+last)/2;
+				
+			}
+			if(found) {
+			int moveright=mid+1;
+			int moveleft=mid-1;
+			Vector record=(Vector)page.get(mid);
+			if(moveright<page.size())
+				record=(Vector)page.get(moveright);
+			while(comparer(record.get(keyIndex), value)>0&&moveright<page.size()) {
+				records.add(record);
+				moveright=moveright+1;
+				if(moveright<page.size())
+					record=(Vector)page.get(moveright);
+			}
+			
+			if(moveleft>-1)
+				record=(Vector)page.get(moveleft);
+			while(comparer(record.get(keyIndex), value)>0&&moveleft>-1) {
+				records.add(record);
+				moveleft=moveleft-1;
+				if(moveleft>-1)
+					record=(Vector)page.get(moveleft);
+			}
+			
+			
+			
+			}
+			
+			
+			}
+		
+		if(operator.equals(">=")) {
+			while(first<=last) {
+				Vector record=(Vector)page.get(mid);
+				Object midValue=record.get(keyIndex);
+				if(comparer(record.get(keyIndex), value)<0) {
+					first=mid+1;
+				}else if(comparer(record.get(keyIndex), value)>=0) {
+					found=true;
+					records.add(record);
+					break;
+				}else {
+					last=mid-1;
+				}
+				mid=(first+last)/2;
+				
+			}
+			if(found) {
+			int moveright=mid+1;
+			int moveleft=mid-1;
+			Vector record=(Vector)page.get(mid);
+			if(moveright<page.size())
+				record=(Vector)page.get(moveright);
+			while(comparer(record.get(keyIndex), value)>=0&&moveright<page.size()) {
+				records.add(record);
+				moveright=moveright+1;
+				if(moveright<page.size())
+					record=(Vector)page.get(moveright);
+			}
+			
+			if(moveleft>-1)
+				record=(Vector)page.get(moveleft);
+			while(comparer(record.get(keyIndex), value)>=0&&moveleft>-1) {
+				records.add(record);
+				moveleft=moveleft-1;
+				if(moveleft>-1)
+					record=(Vector)page.get(moveleft);
+			}
+			
+			
+			
+			}
+			
+			
+			}
+		
+		//check this bassel
+		
+		if(operator.equals("<")) {
+			while(first<=last) {
+				Vector record=(Vector)page.get(mid);
+				Object midValue=record.get(keyIndex);
+				if(comparer(record.get(keyIndex), value)<0) {
+					found=true;
+					records.add(record);
+					break;
+					
+				}else if(comparer(record.get(keyIndex), value)>=0) {
+					last=mid-1;
+				}else {
+					last=mid-1;
+				}
+				mid=(first+last)/2;
+				
+			}
+			if(found) {
+			int moveright=mid+1;
+			int moveleft=mid-1;
+			Vector record=(Vector)page.get(mid);
+			if(moveright<page.size())
+				record=(Vector)page.get(moveright);
+			while(comparer(record.get(keyIndex), value)<0&&moveright<page.size()) {
+				records.add(record);
+				moveright=moveright+1;
+				if(moveright<page.size())
+					record=(Vector)page.get(moveright);
+			}
+			
+			if(moveleft>-1)
+				record=(Vector)page.get(moveleft);
+			while(comparer(record.get(keyIndex), value)<0&&moveleft>-1) {
+				records.add(record);
+				moveleft=moveleft-1;
+				if(moveleft>-1)
+					record=(Vector)page.get(moveleft);
+			}
+			
+			
+			
+			}
+			
+			
+			}
+		
+		
+		if(operator.equals("<=")) {
+			while(first<=last) {
+				Vector record=(Vector)page.get(mid);
+				Object midValue=record.get(keyIndex);
+				if(comparer(record.get(keyIndex), value)<=0) {
+					found=true;
+					records.add(record);
+					break;
+					
+				}else if(comparer(record.get(keyIndex), value)>=0) {
+					last=mid-1;
+				}else {
+					last=mid-1;
+				}
+				mid=(first+last)/2;
+				
+			}
+			if(found) {
+			int moveright=mid+1;
+			int moveleft=mid-1;
+			Vector record=(Vector)page.get(mid);
+			if(moveright<page.size())
+				record=(Vector)page.get(moveright);
+			while(comparer(record.get(keyIndex), value)<=0&&moveright<page.size()) {
+				records.add(record);
+				moveright=moveright+1;
+				if(moveright<page.size())
+					record=(Vector)page.get(moveright);
+			}
+			
+			if(moveleft>-1)
+				record=(Vector)page.get(moveleft);
+			while(comparer(record.get(keyIndex), value)<=0&&moveleft>-1) {
+				records.add(record);
+				moveleft=moveleft-1;
+				if(moveleft>-1)
+					record=(Vector)page.get(moveleft);
+			}
+			
+			
+			
+			}
+			
+			
+			}
+		
+		
+		
+		
+		return records;
+		
+	}
+	
+	
+	 
+	 
+	 
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public  Vector selectHelper(String tableName, String colName, String operator, Object value) throws DBAppException {
+		Vector results=new Vector();
+		
+		// *check if the column is indexed
+		// *use indexedSelect
+		boolean isKey=false;
+		// *the value type is the same as the column type
+		// *load the table
+		Table table=this.loadTable(tableName);
+		Vector rest=this.deserilizetable(tableName);
+		table.setPagesreferences((List<String>) rest.get(0));
+		table.setNumofcreatedpages((int)rest.get(1));
+		// *get the type of the column and parse the value into it
+		int colIndex=-1;
+		for (int i = 0; i < table.getColoumn_names().size(); i++) {
+			if(table.getColoumn_names().get(i).equals(colName)) {
+				colIndex=i;
+				break;
+			}
+		}
+
+
+		isKey=table.getIskey().get(colIndex);
+	
+		String colType=table.getDatatype().get(colIndex);
+		Page p;Vector v;
+		
+		// *loop on pages
+		for(int i=0;i<table.getPagesreferences().size();i++) {
+			p=table.read_page(table.getPagesreferences().get(i));
+			v=p.RecordsGetter();// *got the records in one page
+			
+			if(isKey&&!(operator.equals("!="))) {
+				// *if its on the key we should binary search inside each page :`)
+				
+				results=binarySelect(colIndex, v, value, results, operator);
+				
+				//
+				
+				
+			}else {
+				// *just linear search and check the typecast
+				for(int j=0;j<v.size();j++) {
+					Vector record=(Vector)v.get(j);
+					
+					if(operator.equals("=")) {
+						if(comparer(((Vector)v.get(j)).get(colIndex),value)==0)
+							results.add(record);
+					}else if(operator.equals("!=")) {
+						if(comparer(((Vector)v.get(j)).get(colIndex),value)!=0)
+							results.add(record);
+					}else if(operator.equals("<=")) {
+						if(comparer(((Vector)v.get(j)).get(colIndex),value)==0||comparer(((Vector)v.get(j)).get(colIndex),value)<0)
+							results.add(record);
+					}else if(operator.equals(">=")) {
+						if(comparer(((Vector)v.get(j)).get(colIndex),value)==0||comparer(((Vector)v.get(j)).get(colIndex),value)>0)
+							results.add(record);
+					}else if(operator.equals(">")) {
+						if(comparer(((Vector)v.get(j)).get(colIndex),value)>0)
+							results.add(record);
+					}else if(operator.equals("<")) {
+						if(comparer(((Vector)v.get(j)).get(colIndex),value)<0)
+							results.add(record);
+					}					
+					
+				}
+				
+			}
+					
+					
+					
+					
+			
+			
+		}
+		// java.lang.Integer, java.lang.String,
+		//java.lang.Double, java.lang.Boolean, java.util.Date and java.awt.Polygon
+		
+		
+		
+		
+		
+		
+		return results;
+	}
+	
+	
+	public static int comparer(Object x,Object y) throws DBAppException { 
+	
+		
+		
+		try {
+			if(x instanceof Integer) {
+				return ((Integer)x).compareTo((Integer)y);
+				
+			}
+			if(x instanceof Boolean) {
+				return ((Boolean)x).compareTo((Boolean)y);
+			}
+			if(x instanceof Double) {
+				return (( Double)x).compareTo(( Double)y);
+			}
+			if(x instanceof String) {
+				return ((String)x).compareTo((String)y);
+			}
+			if(x instanceof Polygon) {
+				return polygonCompare(((Polygon)x), ((Polygon)y));
+			}
+			throw new DBAppException("Something went wrong with Comparer");
+		}
+		catch(Exception e) {
+			throw new DBAppException("Something went wrong with Comparer");
+		}
+		
+		
+		
+	}
+	
+	
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Iterator selectFromTable(SQLTerm[] arrSQLTerms,
+			String[] strarrOperators)
+			throws DBAppException{
+		// *number of queries
+		int numberOfResults=arrSQLTerms.length;
+		// *check number of operators and number of queries
+		if(strarrOperators.length!=numberOfResults-1)
+			throw new DBAppException("Wrong number of starr operators");
+		// *array of vectors of result of each query
+		Vector e=new Vector();
+		
+		// *result which i will return its iterator
+		Vector balabizo=new Vector();
+		
+		for (int i = 0; i < numberOfResults; i++) {
+			// *will go in operate each query and 
+			e.add(selectHelper(arrSQLTerms[i]._strTableName, arrSQLTerms[i]._strColumnName,
+														arrSQLTerms[i]._strOperator, arrSQLTerms[i]._objValue));
+			
+		}
+		
+	
+		//operations will the vector of the final results 
+		Iterator gogo =operations(e, strarrOperators).iterator();
+		// gogo is the iterator of the results which will be returned
+		return gogo;
+		
+		
+		
+		
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static Vector operations(Vector results,String[] strarrOperators) {
+		// *recursive method that does the AND/OR/XOR between each query :D
+		
+		if(results.size()==1) {
+			return ((Vector)results.get(0));
+		}else {
+			//first query results
+			Vector first=(Vector)results.remove(0);
+			//2nd query results
+			Vector second=(Vector)results.remove(0);
+			//operation between first and 2nd query
+			String opp=strarrOperators[0]; 
+			//result of the operation between the 2queries
+			Vector f=new Vector();
+			//* but i need to remove the operator i used from strarrOpertors so I will go ahead and remove it
+			String[] newOperators=new String[strarrOperators.length-1];
+			for(int i=0;i<newOperators.length;i++) {
+				//* copies all except the first element
+				newOperators[i]=strarrOperators[i+1];
+			}
+			
+			// * I have  AND  OR   XOR
+			
+			// *first case AND
+			if(opp.equals("AND")) {
+				// *whatever is in the first query must exist in the 2nd query to be in the results
+				// * 1 AND 1 = 1
+				for(int i=0;i<first.size();i++) {
+					if(second.contains((Vector)first.get(i)))
+						f.add((Vector)first.get(i));
+					
+				}
+				
+			}else if(opp.equals("OR")) {
+			// *will add whatever exists but eliminate duplicate records
+				f=first;
+				for(int i=0;i<first.size();i++){
+					if(!(f.contains((Vector)second.get(i))))
+						f.add((Vector)second.get(i));
+				}
+				
+			}else if(opp.equals("XOR")) {
+				// *will add whatever exists in one query result and doesnt exist in the other
+				//                         1 XOR 0 = 1
+				
+				// *adds what's in first but not in second
+				for(int i=0;i<first.size();i++) {
+					if(!(first.contains((Vector)second.get(i))))
+							f.add((Vector)second.get(i));
+				}
+				// *adds what's in second but not in first
+				for(int i=0;i<second.size();i++) {
+					if(!(second.contains((Vector)first.get(i))))
+						f.add((Vector)first.get(i));
+					
+				}
+				
+				
+				
+			}
+			
+			
+			
+			
+			results.add(0, f);
+			
+			
+			
+			return operations(results,newOperators);
+		}
+		
+		
+		
+		
+		
+		
+	}
+	
+
+
+
+
+
 }
