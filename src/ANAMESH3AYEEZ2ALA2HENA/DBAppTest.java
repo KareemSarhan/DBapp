@@ -116,10 +116,10 @@ public class DBAppTest {
 	    htblColNameType.put("name", "java.lang.String");
 		htblColNameType.put("area", "java.awt.Polygon");
 		dbApp.createTable( strTableName, "id", htblColNameType );
-		*/
 		
+		*/
 		// run this loop multiple times to get duplicate records
-		// u can change some elements in the loop to have difrrent records
+		// u can change some elements in the loop to have different records
 		Hashtable htblColNameValue ;
 		/*
 		for(int i=0;i<25;i++) {
@@ -131,11 +131,11 @@ public class DBAppTest {
 		}
 		*/
 		
-		dbApp.createBTreeIndex(strTableName, "name");
+	//	dbApp.createBTreeIndex(strTableName, "name");
 		
-		BPTree<String> b=(BPTree<String>) dbApp.getBPlusTree(strTableName, "name");
+	//	BPTree<String> b=(BPTree<String>) dbApp.getBPlusTree(strTableName, "name");
 		
-		System.out.println(b.searchAll("miro"));
+	//	System.out.println(b.searchAll("miro"));
 		
 		
 		

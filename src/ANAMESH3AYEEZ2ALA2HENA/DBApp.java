@@ -29,31 +29,16 @@ import java.util.Vector;
 import BPTree.BPTree;
 import BPTree.Ref;
 
-// @SuppressWarnings("all")
-/*
- * TO DOOOO 1-deleting empty pages after deleting records
- *
- * 2-having a page counter attribute that only increases so that each time I
- * create a page it takes the number of the counter and increments the counter
- * and whenever a page is deleted the counter doesnt decrement it stays the
- * same.so that no pages with the same name will be created
- *
- *
- * 3-whenever u delete a page file u remove it from the array of page refrences
- * from the table
- *
- * 4-use the polygonCompare method you can use it with two coordinate strings
- * that the user gives u or u can use it with 2 polygons u already have if it
- * returns 1 first poly is bigger if it returns 0 they are equal if it returns
- * -1 2nd poly is bigger
- *
- * 5-make sure any record we try to insert is inserted and no system.out.print
- * commands are active and all exceptions are handled wth DBAPP exception
- *
- *
- *
- */
+
+
+
+
+
 @SuppressWarnings("all")
+
+//TODO:Page files should be created in the data file
+
+//TODO: Please delete all system.out.print and all system.out.print comments
 
 public class DBApp {
 
@@ -80,7 +65,7 @@ public class DBApp {
 
         if (data[0].equals(tableName)) {
           // we should throw Table already exists exception
-          // System.out.println("Table already exists");
+          
           coloumn_names.add(data[1]);
           datatype.add(data[2]);
           if (data[3].equals("False"))
@@ -319,7 +304,7 @@ public class DBApp {
           in.close(); 
           file.close(); 
             
-          System.out.println("Object has been deserialized "); 
+          
  
       } 
         
@@ -504,7 +489,7 @@ public class DBApp {
 		  }
 		
 		 
-		 // *now we are done with creating the tree and need to serialize it intoa file :D	 
+		 // *now we are done with creating the tree and need to serialize it into a file :D	 
 		 
 		 try {
 			  File file=new File("data/"+strTableName+strColName);
@@ -683,8 +668,7 @@ public class DBApp {
 			 
 			 try {
 				  File file=new File("data/"+strTableName+strColName);
-				  if(file.createNewFile()==false)
-					  throw new DBAppException();
+				  
 				  //Saving of object in a file 
 		          FileOutputStream fo = new FileOutputStream(file); 
 		          ObjectOutputStream out = new ObjectOutputStream(fo); 
@@ -735,8 +719,7 @@ public class DBApp {
 			 
 			 try {
 				  File file=new File("data/"+strTableName+strColName);
-				  if(file.createNewFile()==false)
-					  throw new DBAppException();
+				  
 				  //Saving of object in a file 
 		          FileOutputStream fo = new FileOutputStream(file); 
 		          ObjectOutputStream out = new ObjectOutputStream(fo); 
@@ -783,14 +766,14 @@ public class DBApp {
 				  }
 				  
 			  }
-			 System.out.println( t1.searchAll("M"));
+			
 			 
 			 // *now we are done with creating the tree and need to serialize it intoa file :D	 
 			 
 			 try {
 				  File file=new File("data/"+strTableName+strColName);
-				  if(file.createNewFile()==false)
-					  throw new DBAppException();
+				  
+				  
 				  //Saving of object in a file 
 		          FileOutputStream fo = new FileOutputStream(file); 
 		          ObjectOutputStream out = new ObjectOutputStream(fo); 
@@ -843,8 +826,7 @@ public class DBApp {
 			 
 			 try {
 				  File file=new File("data/"+strTableName+strColName);
-				  if(file.createNewFile()==false)
-					  throw new DBAppException();
+				  
 				  //Saving of object in a file 
 		          FileOutputStream fo = new FileOutputStream(file); 
 		          ObjectOutputStream out = new ObjectOutputStream(fo); 
@@ -868,6 +850,8 @@ public class DBApp {
 		  }
 		  
 		  
+		  
+		  csvIndex(strTableName, strColName);
 		  
 		  
 		  
@@ -999,9 +983,8 @@ public class DBApp {
 	    ghayart ay column teshof law indexed ghayar el tree beta3to law la2 yeb2a 5alas dont change
 	    
 	    we by the ay lazem tezawed el 7eta di fel linear search bardo ya3ni ba3d ma teupdate kol column
-	    zawed ta7tih
-	    if(isIndexed(tablename,columnName))
-	    	refreshBTREE 
+	    zawed ta7tih checks men el table calss en law el column da indexed hat call refresh Bplustree
+	    
 	   
 	  
 	  	
@@ -1512,7 +1495,7 @@ public class DBApp {
   }
 
   public static void csvIndex(String tableName, String colName) throws DBAppException {
-	 // TODO: Fix the temp file problem (Bassel:reminder for me)
+	
     String tempFile = "data/temp.csv";
     File oldFile = new File("data/metadata.csv");
     File newFile = new File(tempFile);
@@ -1553,13 +1536,34 @@ public class DBApp {
       pw.close();
       bw.close();
       fw.close();
-
+      
+      // *now all my new data is in Temp so I will return it to metadata then delete the temp file
+      FileWriter  ff= new FileWriter(oldFile);
+      BufferedWriter bb = new BufferedWriter(ff);
+      PrintWriter pp = new PrintWriter(bb);
+      Scanner xx = new Scanner(newFile);
+      xx.useDelimiter("[,\n]");
+      
+      while(xx.hasNext()) {
+    	  tbname = xx.next();
+          cname = xx.next();
+          ctype = xx.next();
+          iskey = xx.next();
+          isIndexed = xx.next();
+    	  pp.write(tbname + "," + cname + "," + ctype + "," + iskey + "," + isIndexed + "\n");
+    	  
+      }
+      
+      xx.close();
+      pp.close();
+      bb.close();
+      ff.close();
       System.gc();
-      oldFile.delete();
-
-      File dodo = new File("data/metadata.csv");
-
-      newFile.renameTo(dodo);
+      newFile.delete();
+      
+      
+      
+      
     } catch (Exception e) {
       throw new DBAppException("Indexing error");
     }
