@@ -36,8 +36,8 @@ public class Page implements Serializable {
 			prop.load(input);
 
 			// get the property value and print it out
-			this.maxnumrecords = 4;
-			// Integer.parseInt(prop.getProperty("MaximumRowsCountinPage")) ;
+			this.maxnumrecords = Integer.parseInt(prop.getProperty("MaximumRowsCountinPage")) ;
+			 
 
 		} catch (IOException ex) {
 			throw new DBAppException("Error with properties file");

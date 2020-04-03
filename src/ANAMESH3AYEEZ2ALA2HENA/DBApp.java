@@ -7,10 +7,13 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -19,34 +22,23 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Scanner;
 import java.util.Vector;
 
-// @SuppressWarnings("all")
-/*
- * TO DOOOO 1-deleting empty pages after deleting records
- *
- * 2-having a page counter attribute that only increases so that each time I
- * create a page it takes the number of the counter and increments the counter
- * and whenever a page is deleted the counter doesnt decrement it stays the
- * same.so that no pages with the same name will be created
- *
- *
- * 3-whenever u delete a page file u remove it from the array of page refrences
- * from the table
- *
- * 4-use the polygonCompare method you can use it with two coordinate strings
- * that the user gives u or u can use it with 2 polygons u already have if it
- * returns 1 first poly is bigger if it returns 0 they are equal if it returns
- * -1 2nd poly is bigger
- *
- * 5-make sure any record we try to insert is inserted and no system.out.print
- * commands are active and all exceptions are handled wth DBAPP exception
- *
- *
- *
- */
+import BPTree.BPTree;
+import BPTree.Ref;
+
+
+
+
+
+
 @SuppressWarnings("all")
+
+//TODO:Page files should be created in the data file
+
+//TODO: Please delete all system.out.print and all system.out.print comments
 
 public class DBApp {
 
@@ -73,7 +65,7 @@ public class DBApp {
 
         if (data[0].equals(tableName)) {
           // we should throw Table already exists exception
-          // System.out.println("Table already exists");
+          
           coloumn_names.add(data[1]);
           datatype.add(data[2]);
           if (data[3].equals("False"))
@@ -286,7 +278,7 @@ public class DBApp {
     // or leave it empty if there is no code you want to
     // execute at application startup
     // creates the metadata file if its not already there
-    System.out.println("Working Directory = " + System.getProperty("user.dir"));
+    //System.out.println("Working Directory = " + System.getProperty("user.dir"));
     File myfile = new File("data/metadata.csv");
     if (myfile.createNewFile()) { // checking if the metadata file is there or not
       String s = "Table Name,Column Name,Column Type,Key,Indexed\n";
@@ -296,11 +288,597 @@ public class DBApp {
       writer.close();
     }
   }
+  
+  
+  public Object getBPlusTree(String strTableName,String strColName) throws DBAppException{
+	  Object o=3;
+	  try
+      {    
+          // Reading the object from a file 
+          FileInputStream file = new FileInputStream("data/"+strTableName+strColName); 
+          ObjectInputStream in = new ObjectInputStream(file); 
+            
+          // Method for deserialization of object 
+          o = (Object)in.readObject(); 
+            
+          in.close(); 
+          file.close(); 
+            
+          
+ 
+      } 
+        
+      catch(Exception ex) {
+    	  
+      }
+	  
+	  
+	  return o;
+  }
+  
+  
+  
+  
+  
+  public void refreshBTree(String strTableName, String strColName)throws DBAppException{
+	  
+	  Table table=this.loadTable(strTableName);
+	  Vector rest=this.deserilizetable(strTableName);
+	  table.setPagesreferences((List<String>) rest.get(0));
+	  table.setNumofcreatedpages((int)rest.get(1));
+	  // *get the type of the column and parse the value into it
+	  int colIndex=-1;
+	 for (int i = 0; i < table.getColoumn_names().size(); i++) {
+		  if(table.getColoumn_names().get(i).equals(strColName)) {
+			  colIndex=i;
+			  break;
+		  }
+	  	}
+	  //* get the type of the column to create the tree with the same type
+	  String colType=table.getDatatype().get(colIndex);
+	  int treeOrder=0;
+	  // java.lang.Integer, java.lang.String,
+	  //java.lang.Double, java.lang.Boolean, java.util.Date and java.awt.Polygon
+	  
+	  
+	  // * this will go to the properties file to get the maximum node size :D
+	  try (InputStream input = new FileInputStream("config/DBApp.properties")) {
 
-  public void createBTreeIndex(String strTableName, String strColName) throws DBAppException {
+			Properties prop = new Properties();
+
+			// load a properties
+
+			prop.load(input);
+
+			// get the property value and print it out
+			
+			treeOrder= Integer.parseInt(prop.getProperty("NodeSize")) ;
+		} catch (IOException ex) {
+			throw new DBAppException("Error with properties file");
+		}
+	  
+	  try {
+		    
+	  if(colType.contentEquals("java.lang.Integer")) {
+		  // *create a BPlus tree with Integer type
+		  BPTree<Integer> t1=new BPTree<Integer>(treeOrder);
+		  
+		  // *Loop over each page in the table
+		  for(int i=0;i<table.getPagesreferences().size();i++) {
+			
+			  // *create page object for each page
+			  Page page=table.read_page(table.getPagesreferences().get(i));
+			  
+			  // *loop over each record in the page and insert it in the tree with its respective place
+			  Vector<Vector> recordss=page.RecordsGetter();
+			  
+			  for(int j=0;j<recordss.size();j++) {
+				  
+				  // *create vector record 
+				  Vector record=recordss.get(j);
+				  
+				  // *insert the respective column key with its position
+				  t1.insert((Integer)record.get(colIndex), new Ref(i, j));
+				  
+			  }
+			  
+		  }
+		
+		 
+		 // *now we are done with creating the tree and need to serialize it intoa file :D	 
+		 
+		 try {
+			  File file=new File("data/"+strTableName+strColName);
+			  
+			  //Saving of object in a file 
+	          FileOutputStream fo = new FileOutputStream(file); 
+	          ObjectOutputStream out = new ObjectOutputStream(fo); 
+	          
+	          // Method for serialization of object 
+	          out.writeObject(t1); 
+	            
+	          out.close(); 
+	          fo.close(); 
+	            
+	         
+			  
+			  
+			  
+			  
+			  }catch(Exception e) {
+				throw new DBAppException("Something went wrong with serializing Btree");  
+			  }
+		 		
+		 //---------------------------------------------------------------------------------------
+	  }else if(colType.contentEquals("java.lang.Double")) {
+		  // *create a BPlus tree with Integer type
+		  BPTree<Double> t1=new BPTree<Double>(treeOrder);
+		  
+		  // *Loop over each page in the table
+		  for(int i=0;i<table.getPagesreferences().size();i++) {
+			
+			  // *create page object for each page
+			  Page page=table.read_page(table.getPagesreferences().get(i));
+			  
+			  // *loop over each record in the page and insert it in the tree with its respective place
+			  Vector<Vector> recordss=page.RecordsGetter();
+			  
+			  for(int j=0;j<recordss.size();j++) {
+				  
+				  // *create vector record 
+				  Vector record=recordss.get(j);
+				  
+				  // *insert the respective column key with its position
+				  t1.insert((Double)record.get(colIndex), new Ref(i, j));
+				  
+			  }
+			  
+		  }
+		 
+		 
+		 // *now we are done with creating the tree and need to serialize it intoa file :D	 
+		 
+		 try {
+			  File file=new File("data/"+strTableName+strColName);
+			  
+			  //Saving of object in a file 
+	          FileOutputStream fo = new FileOutputStream(file); 
+	          ObjectOutputStream out = new ObjectOutputStream(fo); 
+	          
+	          // Method for serialization of object 
+	          out.writeObject(t1); 
+	            
+	          out.close(); 
+	          fo.close(); 
+	            
+	         
+			  
+			  
+			  
+			  
+			  }catch(Exception e) {
+				throw new DBAppException("Something went wrong with serializing Btree");  
+			  }
+		  
+		  
+	  }
+	  //------------------------------------------------------------------------------
+	  else if(colType.contentEquals("java.lang.String")) {
+		  // *create a BPlus tree with Integer type
+		  BPTree<String> t1=new BPTree<String>(treeOrder);
+		  
+		  // *Loop over each page in the table
+		  for(int i=0;i<table.getPagesreferences().size();i++) {
+			
+			  // *create page object for each page
+			  Page page=table.read_page(table.getPagesreferences().get(i));
+			  
+			  // *loop over each record in the page and insert it in the tree with its respective place
+			  Vector<Vector> recordss=page.RecordsGetter();
+			  
+			  for(int j=0;j<recordss.size();j++) {
+				  
+				  // *create vector record 
+				  Vector record=recordss.get(j);
+				  
+				  // *insert the respective column key with its position
+				  t1.insert((String)record.get(colIndex), new Ref(i, j));
+				  
+			  }
+			  
+		  }
+		
+		 
+		 // *now we are done with creating the tree and need to serialize it into a file :D	 
+		 
+		 try {
+			  File file=new File("data/"+strTableName+strColName);
+			  
+			  //Saving of object in a file 
+	          FileOutputStream fo = new FileOutputStream(file); 
+	          ObjectOutputStream out = new ObjectOutputStream(fo); 
+	          
+	          // Method for serialization of object 
+	          out.writeObject(t1); 
+	            
+	          out.close(); 
+	          fo.close(); 
+	            
+	          
+			  
+			  
+			  
+			  
+			  }catch(Exception e) {
+				throw new DBAppException("Something went wrong with serializing Btree");  
+			  }
+		  
+		  
+	  }
+	  //0------------------------------------------------------------------------------------------
+	  else if(colType.contentEquals("java.lang.Boolean")) {
+		  // *create a BPlus tree with Integer type
+		  BPTree<Boolean> t1=new BPTree<Boolean>(treeOrder);
+		  
+		  // *Loop over each page in the table
+		  for(int i=0;i<table.getPagesreferences().size();i++) {
+			
+			  // *create page object for each page
+			  Page page=table.read_page(table.getPagesreferences().get(i));
+			  
+			  // *loop over each record in the page and insert it in the tree with its respective place
+			  Vector<Vector> recordss=page.RecordsGetter();
+			  
+			  for(int j=0;j<recordss.size();j++) {
+				  
+				  // *create vector record 
+				  Vector record=recordss.get(j);
+				  
+				  // *insert the respective column key with its position
+				  t1.insert((Boolean)record.get(colIndex), new Ref(i, j));
+				  
+			  }
+			  
+		  }
+		 System.out.println( t1.searchAll(true));
+		 
+		 // *now we are done with creating the tree and need to serialize it intoa file :D	 
+		 
+		 try {
+			  File file=new File("data/"+strTableName+strColName);
+			  
+			  //Saving of object in a file 
+	          FileOutputStream fo = new FileOutputStream(file); 
+	          ObjectOutputStream out = new ObjectOutputStream(fo); 
+	          
+	          // Method for serialization of object 
+	          out.writeObject(t1); 
+	            
+	          out.close(); 
+	          fo.close(); 
+	            
+	        
+			  
+			  
+			  
+			  
+			  }catch(Exception e) {
+				throw new DBAppException("Something went wrong with serializing Btree");  
+			  }
+		  
+		  
+	  }
+	  
+	  
+	  
+	  
+	  
+	  
+	  	}
+	  catch(DBAppException e) {
+		  throw e;
+	  }
+	  catch(Exception e) {
+	  		throw new DBAppException("Inserting into BPLUS tree went wrong");
+	  			
+	  	}
+	  
+	  
+  }
+	  
+	  
+	  
+	  
+	  
+	  
+	  
+	  
+  
+
+  public void createBTreeIndex(String strTableName, String strColName) throws DBAppException{
+	  
+	  if(canBTreeIndex(strTableName, strColName)) {
+		  
+		  
+		  //* load table object 
+		  Table table=this.loadTable(strTableName);
+		  Vector rest=this.deserilizetable(strTableName);
+		  table.setPagesreferences((List<String>) rest.get(0));
+		  table.setNumofcreatedpages((int)rest.get(1));
+		  // *get the type of the column and parse the value into it
+		  int colIndex=-1;
+		 for (int i = 0; i < table.getColoumn_names().size(); i++) {
+			  if(table.getColoumn_names().get(i).equals(strColName)) {
+				  colIndex=i;
+				  break;
+			  }
+		  	}
+		  //* get the type of the column to create the tree with the same type
+		  String colType=table.getDatatype().get(colIndex);
+		  int treeOrder=0;
+		  // java.lang.Integer, java.lang.String,
+		  //java.lang.Double, java.lang.Boolean, java.util.Date and java.awt.Polygon
+		  
+		  
+		  // * this will go to the properties file to get the maximum node size :D
+		  try (InputStream input = new FileInputStream("config/DBApp.properties")) {
+
+				Properties prop = new Properties();
+
+				// load a properties
+
+				prop.load(input);
+
+				// get the property value and print it out
+				
+				treeOrder= Integer.parseInt(prop.getProperty("NodeSize")) ;
+			} catch (IOException ex) {
+				throw new DBAppException("Error with properties file");
+			}
+		  
+		  try {
+			    
+		  if(colType.contentEquals("java.lang.Integer")) {
+			  // *create a BPlus tree with Integer type
+			  BPTree<Integer> t1=new BPTree<Integer>(treeOrder);
+			  
+			  // *Loop over each page in the table
+			  for(int i=0;i<table.getPagesreferences().size();i++) {
+				
+				  // *create page object for each page
+				  Page page=table.read_page(table.getPagesreferences().get(i));
+				  
+				  // *loop over each record in the page and insert it in the tree with its respective place
+				  Vector<Vector> recordss=page.RecordsGetter();
+				  
+				  for(int j=0;j<recordss.size();j++) {
+					  
+					  // *create vector record 
+					  Vector record=recordss.get(j);
+					  
+					  // *insert the respective column key with its position
+					  t1.insert((Integer)record.get(colIndex), new Ref(i, j));
+					  
+				  }
+				  
+			  }
+			
+			 
+			 // *now we are done with creating the tree and need to serialize it intoa file :D	 
+			 
+			 try {
+				  File file=new File("data/"+strTableName+strColName);
+				  
+				  //Saving of object in a file 
+		          FileOutputStream fo = new FileOutputStream(file); 
+		          ObjectOutputStream out = new ObjectOutputStream(fo); 
+		          
+		          // Method for serialization of object 
+		          out.writeObject(t1); 
+		            
+		          out.close(); 
+		          fo.close(); 
+		            
+		         
+				  
+				  
+				  
+				  
+				  }catch(Exception e) {
+					throw new DBAppException("Something went wrong with serializing Btree");  
+				  }
+			 		
+			 //---------------------------------------------------------------------------------------
+		  }else if(colType.contentEquals("java.lang.Double")) {
+			  // *create a BPlus tree with Integer type
+			  BPTree<Double> t1=new BPTree<Double>(treeOrder);
+			  
+			  // *Loop over each page in the table
+			  for(int i=0;i<table.getPagesreferences().size();i++) {
+				
+				  // *create page object for each page
+				  Page page=table.read_page(table.getPagesreferences().get(i));
+				  
+				  // *loop over each record in the page and insert it in the tree with its respective place
+				  Vector<Vector> recordss=page.RecordsGetter();
+				  
+				  for(int j=0;j<recordss.size();j++) {
+					  
+					  // *create vector record 
+					  Vector record=recordss.get(j);
+					  
+					  // *insert the respective column key with its position
+					  t1.insert((Double)record.get(colIndex), new Ref(i, j));
+					  
+				  }
+				  
+			  }
+			 
+			 
+			 // *now we are done with creating the tree and need to serialize it intoa file :D	 
+			 
+			 try {
+				  File file=new File("data/"+strTableName+strColName);
+				  
+				  //Saving of object in a file 
+		          FileOutputStream fo = new FileOutputStream(file); 
+		          ObjectOutputStream out = new ObjectOutputStream(fo); 
+		          
+		          // Method for serialization of object 
+		          out.writeObject(t1); 
+		            
+		          out.close(); 
+		          fo.close(); 
+		            
+		         
+				  
+				  
+				  
+				  
+				  }catch(Exception e) {
+					throw new DBAppException("Something went wrong with serializing Btree");  
+				  }
+			  
+			  
+		  }
+		  //------------------------------------------------------------------------------
+		  else if(colType.contentEquals("java.lang.String")) {
+			  // *create a BPlus tree with Integer type
+			  BPTree<String> t1=new BPTree<String>(treeOrder);
+			  
+			  // *Loop over each page in the table
+			  for(int i=0;i<table.getPagesreferences().size();i++) {
+				
+				  // *create page object for each page
+				  Page page=table.read_page(table.getPagesreferences().get(i));
+				  
+				  // *loop over each record in the page and insert it in the tree with its respective place
+				  Vector<Vector> recordss=page.RecordsGetter();
+				  
+				  for(int j=0;j<recordss.size();j++) {
+					  
+					  // *create vector record 
+					  Vector record=recordss.get(j);
+					  
+					  // *insert the respective column key with its position
+					  t1.insert((String)record.get(colIndex), new Ref(i, j));
+					  
+				  }
+				  
+			  }
+			
+			 
+			 // *now we are done with creating the tree and need to serialize it intoa file :D	 
+			 
+			 try {
+				  File file=new File("data/"+strTableName+strColName);
+				  
+				  
+				  //Saving of object in a file 
+		          FileOutputStream fo = new FileOutputStream(file); 
+		          ObjectOutputStream out = new ObjectOutputStream(fo); 
+		          
+		          // Method for serialization of object 
+		          out.writeObject(t1); 
+		            
+		          out.close(); 
+		          fo.close(); 
+		            
+		          
+				  
+				  
+				  
+				  
+				  }catch(Exception e) {
+					throw new DBAppException("Something went wrong with serializing Btree");  
+				  }
+			  
+			  
+		  }
+		  //0------------------------------------------------------------------------------------------
+		  else if(colType.contentEquals("java.lang.Boolean")) {
+			  // *create a BPlus tree with Integer type
+			  BPTree<Boolean> t1=new BPTree<Boolean>(treeOrder);
+			  
+			  // *Loop over each page in the table
+			  for(int i=0;i<table.getPagesreferences().size();i++) {
+				
+				  // *create page object for each page
+				  Page page=table.read_page(table.getPagesreferences().get(i));
+				  
+				  // *loop over each record in the page and insert it in the tree with its respective place
+				  Vector<Vector> recordss=page.RecordsGetter();
+				  
+				  for(int j=0;j<recordss.size();j++) {
+					  
+					  // *create vector record 
+					  Vector record=recordss.get(j);
+					  
+					  // *insert the respective column key with its position
+					  t1.insert((Boolean)record.get(colIndex), new Ref(i, j));
+					  
+				  }
+				  
+			  }
+			 System.out.println( t1.searchAll(true));
+			 
+			 // *now we are done with creating the tree and need to serialize it intoa file :D	 
+			 
+			 try {
+				  File file=new File("data/"+strTableName+strColName);
+				  
+				  //Saving of object in a file 
+		          FileOutputStream fo = new FileOutputStream(file); 
+		          ObjectOutputStream out = new ObjectOutputStream(fo); 
+		          
+		          // Method for serialization of object 
+		          out.writeObject(t1); 
+		            
+		          out.close(); 
+		          fo.close(); 
+		            
+		        
+				  
+				  
+				  
+				  
+				  }catch(Exception e) {
+					throw new DBAppException("Something went wrong with serializing Btree");  
+				  }
+			  
+			  
+		  }
+		  
+		  
+		  
+		  csvIndex(strTableName, strColName);
+		  
+		  
+		  
+		  
+		  	}
+		  catch(DBAppException e) {
+			  throw e;
+		  }
+		  catch(Exception e) {
+		  		throw new DBAppException("Inserting into BPLUS tree went wrong");
+		  			
+		  	}
+		  
+		  
+	  }
+	  
+	  
+	  
+	  
+	  
+	  
   }
 
   public void createRTreeIndex(String strTableName, String strColName) throws DBAppException {
+	  
+	  
+	  
   }
 
   public void insertIntoTable(String tablename, Hashtable<String, Object> htblColNameValue)
@@ -345,12 +923,7 @@ public class DBApp {
     }
   }
 
-  // public static void /*Iterator*/ selectFromTable(SQLTerm[] arrSQLTerms,
-  // String[] strarrOperators)
-  // throws DBAppException{
-  //
-  // //needs to return an object that inherits iterator i think
-  // }
+  
   public static List<String> deserilizetableOLD(String tblname) {
     try {
       // System.out.println("testo.txt");
@@ -369,6 +942,61 @@ public class DBApp {
 
   public void updateTable(String strTableName, String strKey, Hashtable<String, Object> htblColNameValue)
       throws DBAppException, IOException {
+	  /*bos yasta enta lama betgigi te update betecheck 3ala  column tab3an we betgib el values
+	   * 
+	    el haitghaiar howa enak lazem teshof el awel el column da indexed wala mesh indexed ya3ni
+	    3ando tree wala la2 law ah fa enta hatro7 tegib el tree beta3to we te3mel search biha
+	    tab3an hat2oli ezai ha2olak 
+	    awalan lazem teb2a 3aref type el column ya3ni Integer wala Double wala eh bezabt
+	    now ma3ak el type hat create tree keda
+	    BPTree<Integer> tree;
+	    
+	    now enta 3awz el tree beta3tak teb2a zayi el tree el fel memory fa hate3mel gettree method
+	    tree=getBPlusTree(strTableName, strColName)
+	    
+	    BUT fi 7aga el method di betraga3 object fa hate3melha type cast le type el tree beta3tak
+	    tree=getBPlusTree(strTableName, strColName);
+	    
+	    keda enta ma3ak el tree delwa2ti 3awz tegib el records el maslan 3andohom id 3
+	    
+	    Vector<Vector<Integer>>=tree.searchAll(new Integer(3));
+	    
+	    da hairaga3lak el indexes beta3t kol el records el fel tree el be 3 bel manzar da
+	    	record                          record                          record
+	    [ [page number,index in page], [page number,index in page], [page number,index in page] ]
+	    
+	    [ [2,3],[2,5],[3,4] ]
+	    
+	    ya3ni hatro7 array page refrences we tegeib refrences.get(page number) haidik el page el fiha awel record
+	    ba3d keda hate3mel men el page .get(index in page) hairaga3lak el record bezabt
+	    
+	    tab3an lazem ta5od balak men el diffrent types we en el tree beteb2a 3ala column wa7ed mesh 3al table kolo
+	    we momken columns yeb2a liha tree we momken la2 plz test carefully 3ashan 3aleha daragat ketir
+	    
+	    ba3d ma teupdate records beta3t column mo3aian plz et2aked
+	    hal el column da isIndexed? 3ashan law ah yeb2a howa 3ando bplus tree lazem tetghayar ma3ah
+	    fa hat call refreshBTree(String strTableName, String strColName)
+	    
+	    
+	    7awel bas plz te test el tree lewa7daha abl ai 7aga we tefham heia betraga3lak eh we te3melo print we 
+	    keda heia el donia sahla fel trees el mohem bas enak testa3mel amaken el records menaha we law
+	    ghayart ay column teshof law indexed ghayar el tree beta3to law la2 yeb2a 5alas dont change
+	    
+	    we by the ay lazem tezawed el 7eta di fel linear search bardo ya3ni ba3d ma teupdate kol column
+	    zawed ta7tih checks men el table calss en law el column da indexed hat call refresh Bplustree
+	    
+	   
+	  
+	  	if its a polygon dont create b+tree we will implement the R tree in that case so just put a comment
+	  	//create r tree
+	  
+	  
+	  */
+	  
+	  
+	  
+	  
+	  
     Table table = this.loadTable(strTableName);
     table.setPagesreferences(this.deserilizetableOLD(strTableName));
     // first we check that the data entered in the hash table is consistent
@@ -443,9 +1071,9 @@ public class DBApp {
                 }
                 // System.out.println(temp);
                 // we add the old record after modifying it
-                System.out.println("insert before");
+                
                 table.inserttotable(temp);
-                System.out.println("insert AFTER");
+                
               }
               // table.inserttotable(temp);
               continue;
@@ -453,14 +1081,11 @@ public class DBApp {
             continue;
           }
 
-          System.out.println(temp.get(0));
-          System.out.println(strKey);
-          System.out.println("");
-          System.out.println((temp.get(0)).equals(strKey));
+        
           if ((temp.get(0).toString()).equals(strKey)) {
             // here we found the targeted record so we remove it form the record
             table.removefromtable(temp);
-            System.out.println("hna");
+            
             for (int k = 0; k < newRecord.size(); k++) {
               // we only change the changed or the entered columns to avoid nulls
               if (newRecord.get(k) == "") {
@@ -475,9 +1100,9 @@ public class DBApp {
                   temp.set(k, newRecord.get(k));
               }
               // we add the old record after modifying it
-              System.out.println("insert before");
+              
               table.inserttotable(temp);
-              System.out.println("insert AFTER");
+              
             }
           }
         }
@@ -506,6 +1131,58 @@ public class DBApp {
 
   public void deleteFromTable(String tablename, Hashtable<String, Object> htblColNameValue)
       throws DBAppException, IOException {
+	  
+	  /*bos yasta enta lama betgigi te delete betecheck 3ala kaza column tab3an we betgib el values
+	   * 
+	    el haitghaiar howa enak lazem teshof el awel el column da indexed wala mesh indexed ya3ni
+	    3ando tree wala la2 law ah fa enta hatro7 tegib el tree beta3to we te3mel search biha
+	    tab3an hat2oli ezai ha2olak 
+	    awalan lazem teb2a 3aref type el column ya3ni Integer wala Double wala eh bezabt
+	    now ma3ak el type hat create tree keda
+	    BPTree<Integer> tree;
+	    
+	    now enta 3awz el tree beta3tak teb2a zayi el tree el fel memory fa hate3mel gettree method
+	    tree=getBPlusTree(strTableName, strColName)
+	    
+	    BUT fi 7aga el method di betraga3 object fa hate3melha type cast le type el tree beta3tak
+	    tree=(BPTree<Integer>)tree=getBPlusTree(strTableName, strColName);
+	    
+	    keda enta ma3ak el tree delwa2ti 3awz tegib el records el maslan 3andohom id 3
+	    
+	    Vector<Vector<Integer>>=tree.searchAll(new Integer(3));
+	    
+	    da hairaga3lak el indexes beta3t kol el records el fel tree el be 3 bel manzar da
+	    
+	    [ [page number,index in page],[page number,index in page],[page number,index in page] ]
+	    [ [2,3],[2,5],[3,4] ]
+	    
+	    ya3ni hatro7 array page refrences we tegeib refrences.get(page number) haidik el page el fiha awel record
+	    ba3d keda hate3mel men el page .get(index in page) hairaga3lak el record bezabt
+	    
+	    tab3an lazem ta5od balak men el diffrent types we en el tree beteb2a 3ala column wa7ed mesh 3al table kolo
+	    we momken columns yeb2a liha tree we momken la2 plz test carefully 3ashan 3aleha daragat ketir
+	    
+	    ba3d matemsa7 records men page 
+	    
+	   always use the indexed columns first
+	   enta law fi column fi tree hatgib meno el page indexes we ba3d keda law fi column tani maslan leih tree hatgib
+	   bardo el indexes we teshof el cummon mabenhom we fel a5er tetala3 el records di teshof eh menha bei meet el
+	   condition el a5ir beta3 el column el mafhosh index da
+	  
+	  	ba3d matemsa7 kol 7aga men el pages ya me3alem hate3mel call le method esmaha
+	  	refreshBPtree(string tablename,String column name)
+	  	3ala kol indexed column fel page use the method isIndexed law ah call 3aleh refreshBptree
+	  	law la2 dont do anything
+	  	3ashan enta lama betemsa7 men el pages amaken el elements betetghayar fa lazem ne3mel
+	  	el tree men el awel tani :D
+	   
+	   
+	   if its a polygon dont create b+tree we will implement the R tree in that case so just put a comment
+	  	//create r tree
+	  
+	  */
+  
+	  
     Table table = this.loadTable(tablename);
     Vector rest = this.deserilizetable(tablename);
     table.setPagesreferences((List<String>) rest.get(0));
@@ -544,9 +1221,9 @@ public class DBApp {
       Vector out = table.removefromtable(record);
       for (int i = 0; i < out.size(); i++) {
         File F = new File(out.get(i) + "");
-        System.out.println("FILE GOT DELETED = " + F.delete());
+    
       }
-      // System.out.print(table.getPagesreferences());
+      
     }
 
   }
@@ -822,7 +1499,7 @@ public class DBApp {
   }
 
   public static void csvIndex(String tableName, String colName) throws DBAppException {
-	 // TODO: Fix the temp file problem (Bassel:reminder for me)
+	
     String tempFile = "data/temp.csv";
     File oldFile = new File("data/metadata.csv");
     File newFile = new File(tempFile);
@@ -863,13 +1540,34 @@ public class DBApp {
       pw.close();
       bw.close();
       fw.close();
-
+      
+      // *now all my new data is in Temp so I will return it to metadata then delete the temp file
+      FileWriter  ff= new FileWriter(oldFile);
+      BufferedWriter bb = new BufferedWriter(ff);
+      PrintWriter pp = new PrintWriter(bb);
+      Scanner xx = new Scanner(newFile);
+      xx.useDelimiter("[,\n]");
+      
+      while(xx.hasNext()) {
+    	  tbname = xx.next();
+          cname = xx.next();
+          ctype = xx.next();
+          iskey = xx.next();
+          isIndexed = xx.next();
+    	  pp.write(tbname + "," + cname + "," + ctype + "," + iskey + "," + isIndexed + "\n");
+    	  
+      }
+      
+      xx.close();
+      pp.close();
+      bb.close();
+      ff.close();
       System.gc();
-      oldFile.delete();
-
-      File dodo = new File("data/metadata.csv");
-
-      newFile.renameTo(dodo);
+      newFile.delete();
+      
+      
+      
+      
     } catch (Exception e) {
       throw new DBAppException("Indexing error");
     }
@@ -1211,8 +1909,7 @@ public class DBApp {
 			
 			
 		}
-		// java.lang.Integer, java.lang.String,
-		//java.lang.Double, java.lang.Boolean, java.util.Date and java.awt.Polygon
+		
 		
 		
 		
@@ -1368,7 +2065,9 @@ public class DBApp {
 		
 	}
 	
-
+	public void isIndexed() {
+		
+	}
 
 
 

@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Iterator;
 
+import BPTree.BPTree;
+
 @SuppressWarnings("all")
 
 public class DBAppTest {
@@ -54,17 +56,17 @@ public class DBAppTest {
 		
 		
 //---------------------------------Select Tests---------------------------
-		String strTableName = "gay";
+/*		String strTableName = "gay";
 		DBApp dbApp = new DBApp( );
 		dbApp.init();
 		/*Hashtable htblColNameType = new Hashtable( );
 		htblColNameType.put("id", "java.lang.Integer");
 	    htblColNameType.put("name", "java.lang.String");
 		htblColNameType.put("area", "java.awt.Polygon");
-		dbApp.createTable( strTableName, "id", htblColNameType );*/
+		dbApp.createTable( strTableName, "id", htblColNameType );
 		
-		// *run this loop multiple times to get duplicate records
-		// *u can change some elements in the loop to have difrrent records
+		// run this loop multiple times to get duplicate records
+		// u can change some elements in the loop to have difrrent records
 		Hashtable htblColNameValue ;
 		for(int i=0;i<25;i++) {
 		htblColNameValue = new Hashtable( );
@@ -99,8 +101,43 @@ public class DBAppTest {
 		while(result.hasNext()) {
 			System.out.println(result.next());
 		}
+		
+		*/
 
-	//------------------------------------------------------------------------------------	
+	//-------------------------------------CreateBPlustree Testing-----------------------------------------------	
+		
+		String strTableName = "gay";
+		DBApp dbApp = new DBApp( );
+		dbApp.init();
+		
+		/*
+		Hashtable htblColNameType = new Hashtable( );
+		htblColNameType.put("id", "java.lang.Integer");
+	    htblColNameType.put("name", "java.lang.String");
+		htblColNameType.put("area", "java.awt.Polygon");
+		dbApp.createTable( strTableName, "id", htblColNameType );
+		
+		*/
+		// run this loop multiple times to get duplicate records
+		// u can change some elements in the loop to have different records
+		Hashtable htblColNameValue ;
+		/*
+		for(int i=0;i<25;i++) {
+		htblColNameValue = new Hashtable( );
+		htblColNameValue.put("id", new Integer( i ));
+		htblColNameValue.put("name", new String("miro" ) );
+		htblColNameValue.put("area", new String("(0,0),(0,0),(0,0),(0,0)") );
+		dbApp.insertIntoTable( strTableName , htblColNameValue );
+		}
+		*/
+		
+	//	dbApp.createBTreeIndex(strTableName, "name");
+		
+	//	BPTree<String> b=(BPTree<String>) dbApp.getBPlusTree(strTableName, "name");
+		
+	//	System.out.println(b.searchAll("miro"));
+		
+		
 		
 	}
 
