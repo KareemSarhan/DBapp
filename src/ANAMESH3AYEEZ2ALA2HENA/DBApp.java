@@ -987,7 +987,8 @@ public class DBApp {
 	    
 	   
 	  
-	  	
+	  	if its a polygon dont create b+tree we will implement the R tree in that case so just put a comment
+	  	//create r tree
 	  
 	  
 	  */
@@ -1174,7 +1175,10 @@ public class DBApp {
 	  	law la2 dont do anything
 	  	3ashan enta lama betemsa7 men el pages amaken el elements betetghayar fa lazem ne3mel
 	  	el tree men el awel tani :D
-	  
+	   
+	   
+	   if its a polygon dont create b+tree we will implement the R tree in that case so just put a comment
+	  	//create r tree
 	  
 	  */
   
