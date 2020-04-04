@@ -40,7 +40,7 @@ import BPTree.Ref;
 
 //TODO: Please delete all system.out.print and all system.out.print comments
 
-public class DBApp {
+public class DBApp <T extends Comparable<T>> {
 
   public DBApp() {
   }
@@ -921,6 +921,9 @@ public class DBApp {
       table.inserttotable(record);
       // System.out.print(table.getPagesreferences());
     }
+    
+    
+    
   }
 
   
@@ -1827,9 +1830,70 @@ public class DBApp {
 		return records;
 		
 	}
+  
+  
+  
+  
+    public Vector newBPSelect(String tableName, String colName, String operator, Object value,List<String> pages)throws DBAppException{
+    	
+    	Vector<Vector<Integer>> y=new Vector<Vector<Integer>>();
+    	Vector results=new Vector();
+		BPTree<T> t;
+		Table table=this.loadTable(tableName);
+		Vector rest=this.deserilizetable(tableName);
+		table.setPagesreferences(pages);
+		table.setNumofcreatedpages((int)rest.get(1));
+		int colIndex=0;
+		try {
+		BPTree<T> tree=(BPTree<T>) getBPlusTree(tableName, colName);
+		
+		for (int j = 0; j < table.getColoumn_names().size(); j++) {
+			if(table.getColoumn_names().get(j).equals(colName)) {
+				colIndex=j;
+				break;
+			}
+		}
+		String colType=table.getDatatype().get(colIndex);
+		switch (operator) {
+		case "=": y=tree.searchAll((T) value);
+			break;
+			
+		case "<": y=tree.getLessThan((T) value);
+			break;
+			
+		case "<=": y=tree.getLessThanOrEqual((T)value);
+			break;
+			
+		case">":  y=tree.getMoreThan((T)value);
+			break;
+		
+		case">=": y=tree.getMoreThanOrEqual((T)value);
+			break; 
+			
+		case"!=": y=tree.getNotEqual((T)value);
+			break;
+		default:
+			throw new DBAppException("Unvalid operator");
+			
+		}
+		
+		
+		
+		
+		for(int i=0;i<y.size();i++) {
+			int pageNo=y.get(i).get(0);
+			int place=y.get(i).get(1);
+			Page page=table.read_page(pages.get(pageNo));
+			results.add(page.RecordsGetter().get(place));
+			
+		}
+		return results;
+		}catch(Exception e) {
+			throw new DBAppException("column is indexed but something went wrong with select");
+		}
+    	
+    }
 	
-	
-	 
 	 
 	 
 	
@@ -1838,6 +1902,7 @@ public class DBApp {
 		Vector results=new Vector();
 		
 		// *check if the column is indexed
+		boolean isIndex=false;
 		// *use indexedSelect
 		boolean isKey=false;
 		// *the value type is the same as the column type
@@ -1854,8 +1919,9 @@ public class DBApp {
 				break;
 			}
 		}
-
-
+		
+		
+		isIndex=table.getIsindexed().get(colIndex);
 		isKey=table.getIskey().get(colIndex);
 	
 		String colType=table.getDatatype().get(colIndex);
@@ -1866,6 +1932,12 @@ public class DBApp {
 			p=table.read_page(table.getPagesreferences().get(i));
 			v=p.RecordsGetter();// *got the records in one page
 			
+			
+	
+			
+				
+				
+				
 			if(isKey&&!(operator.equals("!="))) {
 				// *if its on the key we should binary search inside each page :`)
 				
@@ -1902,7 +1974,7 @@ public class DBApp {
 				}
 				
 			}
-					
+			
 					
 					
 					
@@ -1968,11 +2040,37 @@ public class DBApp {
 		// *result which i will return its iterator
 		Vector balabizo=new Vector();
 		
+		// * I need to get to see if its indexed or not
+		boolean isIndex=false;
+		// *load the table
+		
+		// *get the type of the column and parse the value into it
+		int colIndex=-1;
+		
 		for (int i = 0; i < numberOfResults; i++) {
-			// *will go in operate each query and 
-			e.add(selectHelper(arrSQLTerms[i]._strTableName, arrSQLTerms[i]._strColumnName,
-														arrSQLTerms[i]._strOperator, arrSQLTerms[i]._objValue));
+			// * get table info to check if the column is indexed for each query
+			String tableName=arrSQLTerms[i]._strTableName;
+			String colName=arrSQLTerms[i]._strColumnName;
+			Table table=this.loadTable(tableName);
+			Vector rest=this.deserilizetable(tableName);
+			table.setPagesreferences((List<String>) rest.get(0));
+			table.setNumofcreatedpages((int)rest.get(1));
+			for (int j = 0; j < table.getColoumn_names().size(); j++) {
+				if(table.getColoumn_names().get(j).equals(colName)) {
+					colIndex=j;
+					break;
+				}
+			}
+			isIndex=table.getIsindexed().get(colIndex);
+			if(isIndex) {
+				e.add(newBPSelect(tableName, colName, arrSQLTerms[i]._strOperator, arrSQLTerms[i]._objValue,table.getPagesreferences()));
+				
+			}
 			
+			else {
+			// *will go in operate each query and 
+			e.add(selectHelper(arrSQLTerms[i]._strTableName, arrSQLTerms[i]._strColumnName,arrSQLTerms[i]._strOperator, arrSQLTerms[i]._objValue)); 
+			}
 		}
 		
 	
@@ -1990,7 +2088,10 @@ public class DBApp {
 	public static Vector operations(Vector results,String[] strarrOperators) {
 		// *recursive method that does the AND/OR/XOR between each query :D
 		
-		if(results.size()==1) {
+		if(results.size()<=1) {
+			if(results.size()==0)
+				return new Vector();
+			
 			return ((Vector)results.get(0));
 		}else {
 			//first query results
@@ -2023,7 +2124,7 @@ public class DBApp {
 			}else if(opp.equals("OR")) {
 			// *will add whatever exists but eliminate duplicate records
 				f=first;
-				for(int i=0;i<first.size();i++){
+				for(int i=0;i<second.size();i++){
 					if(!(f.contains((Vector)second.get(i))))
 						f.add((Vector)second.get(i));
 				}
@@ -2033,7 +2134,7 @@ public class DBApp {
 				//                         1 XOR 0 = 1
 				
 				// *adds what's in first but not in second
-				for(int i=0;i<first.size();i++) {
+				for(int i=0;i<second.size();i++) {
 					if(!(first.contains((Vector)second.get(i))))
 							f.add((Vector)second.get(i));
 				}

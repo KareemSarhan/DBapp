@@ -57,7 +57,7 @@ public class BPTreeLeafNode<T extends Comparable<T>> extends BPTreeNode<T> imple
 	}
 
 	/**
-	 * @return the reference of the last record
+	 * @return the reference of the first record
 	 */
 	public Ref getFirstRecord()
 	{

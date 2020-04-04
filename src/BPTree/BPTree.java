@@ -134,4 +134,213 @@ public class BPTree<T extends Comparable<T>> implements Serializable{
 		return indexes;
 	}
 	
+	
+	public Vector<Vector<Integer>> getLessThan(T value) {
+		BPTree<T> tito=this;
+		
+		Vector<Vector<Integer>> indexes=new Vector<Vector<Integer>>();
+		BPTreeNode<T> curNode = tito.root;
+		
+		
+		while(curNode instanceof BPTreeInnerNode) {
+			BPTreeInnerNode<T> parent = (BPTreeInnerNode<T>) curNode;
+			curNode=parent.getFirstChild();
+			
+		}
+		boolean flag=true;
+		// *got first leaf
+		BPTreeLeafNode<T> leaf=(BPTreeLeafNode)curNode;
+		
+		
+		while(leaf.getNext()!=null) {
+			Comparable<T>[] keys=leaf.keys;
+			
+			for(int i=0;i<keys.length;i++) {
+				
+				if(keys[i].compareTo(value)<0) {
+					Vector<Vector<Integer>> copy=tito.searchAll((T) keys[i]);
+					
+					for(int k=0;k<copy.size();k++) {
+						indexes.add(copy.get(k));
+					}
+						
+				}
+				
+			}
+			leaf=leaf.getNext();
+		}
+		
+		
+			
+		return indexes;
+		
+	
+	}
+	public Vector<Vector<Integer>> getLessThanOrEqual(T value) {
+		BPTree<T> tito=this;
+		
+		Vector<Vector<Integer>> indexes=new Vector<Vector<Integer>>();
+		BPTreeNode<T> curNode = tito.root;
+		
+		
+		while(curNode instanceof BPTreeInnerNode) {
+			BPTreeInnerNode<T> parent = (BPTreeInnerNode<T>) curNode;
+			curNode=parent.getFirstChild();
+			
+		}
+		boolean flag=true;
+		// *got first leaf
+		BPTreeLeafNode<T> leaf=(BPTreeLeafNode)curNode;
+		
+		
+		while(leaf.getNext()!=null) {
+			Comparable<T>[] keys=leaf.keys;
+			
+			for(int i=0;i<keys.length;i++) {
+				
+				if(keys[i].compareTo(value)<=0) {
+					Vector<Vector<Integer>> copy=tito.searchAll((T) keys[i]);
+					
+					for(int k=0;k<copy.size();k++) {
+						indexes.add(copy.get(k));
+					}
+						
+				}
+				
+			}
+			leaf=leaf.getNext();
+		}
+		
+		
+			
+		return indexes;
+		
+	
+	}
+	
+	public Vector<Vector<Integer>> getMoreThan(T value){
+		
+		BPTree<T> tito=this;
+		
+		Vector<Vector<Integer>> indexes=new Vector<Vector<Integer>>();
+		BPTreeNode<T> curNode = tito.root;
+		
+		
+		while(curNode instanceof BPTreeInnerNode) {
+			BPTreeInnerNode<T> parent = (BPTreeInnerNode<T>) curNode;
+			curNode=parent.getFirstChild();
+			
+		}
+		boolean flag=true;
+		// *got first leaf
+		BPTreeLeafNode<T> leaf=(BPTreeLeafNode)curNode;
+		
+		
+		while(leaf.getNext()!=null) {
+			Comparable<T>[] keys=leaf.keys;
+			
+			for(int i=0;i<keys.length;i++) {
+				
+				if(keys[i].compareTo(value)>0) {
+					Vector<Vector<Integer>> copy=tito.searchAll((T) keys[i]);
+					
+					for(int k=0;k<copy.size();k++) {
+						indexes.add(copy.get(k));
+					}
+						
+				}
+				
+			}
+			leaf=leaf.getNext();
+		}
+		
+		
+			
+		return indexes;
+	}
+	
+	public Vector<Vector<Integer>> getMoreThanOrEqual(T value){
+		
+		BPTree<T> tito=this;
+		
+		Vector<Vector<Integer>> indexes=new Vector<Vector<Integer>>();
+		BPTreeNode<T> curNode = tito.root;
+		
+		
+		while(curNode instanceof BPTreeInnerNode) {
+			BPTreeInnerNode<T> parent = (BPTreeInnerNode<T>) curNode;
+			curNode=parent.getFirstChild();
+			
+		}
+		boolean flag=true;
+		// *got first leaf
+		BPTreeLeafNode<T> leaf=(BPTreeLeafNode)curNode;
+		
+		
+		while(leaf.getNext()!=null) {
+			Comparable<T>[] keys=leaf.keys;
+			
+			for(int i=0;i<keys.length;i++) {
+				//System.out.print(keys[i]+" ");
+				if(keys[i].compareTo(value)>=0) {
+					Vector<Vector<Integer>> copy=tito.searchAll((T) keys[i]);
+					
+					for(int k=0;k<copy.size();k++) {
+						indexes.add(copy.get(k));
+					}
+						
+				}
+				
+			}
+			leaf=leaf.getNext();
+		}
+		
+		
+			
+		return indexes;
+	}
+	
+	
+	public Vector<Vector<Integer>> getNotEqual(T value){
+		
+		BPTree<T> tito=this;
+		
+		Vector<Vector<Integer>> indexes=new Vector<Vector<Integer>>();
+		BPTreeNode<T> curNode = tito.root;
+		
+		
+		while(curNode instanceof BPTreeInnerNode) {
+			BPTreeInnerNode<T> parent = (BPTreeInnerNode<T>) curNode;
+			curNode=parent.getFirstChild();
+			
+		}
+		boolean flag=true;
+		// *got first leaf
+		BPTreeLeafNode<T> leaf=(BPTreeLeafNode)curNode;
+		
+		
+		while(leaf.getNext()!=null) {
+			Comparable<T>[] keys=leaf.keys;
+			
+			for(int i=0;i<keys.length;i++) {
+				
+				if(keys[i].compareTo(value)!=0) {
+					Vector<Vector<Integer>> copy=tito.searchAll((T) keys[i]);
+					
+					for(int k=0;k<copy.size();k++) {
+						indexes.add(copy.get(k));
+					}
+						
+				}
+				
+			}
+			leaf=leaf.getNext();
+		}
+		
+		
+			
+		return indexes;
+	}
+	
+	
 }

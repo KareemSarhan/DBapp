@@ -56,56 +56,6 @@ public class DBAppTest {
 		
 		
 //---------------------------------Select Tests---------------------------
-/*		String strTableName = "gay";
-		DBApp dbApp = new DBApp( );
-		dbApp.init();
-		/*Hashtable htblColNameType = new Hashtable( );
-		htblColNameType.put("id", "java.lang.Integer");
-	    htblColNameType.put("name", "java.lang.String");
-		htblColNameType.put("area", "java.awt.Polygon");
-		dbApp.createTable( strTableName, "id", htblColNameType );
-		
-		// run this loop multiple times to get duplicate records
-		// u can change some elements in the loop to have difrrent records
-		Hashtable htblColNameValue ;
-		for(int i=0;i<25;i++) {
-		htblColNameValue = new Hashtable( );
-		htblColNameValue.put("id", new Integer( i ));
-		htblColNameValue.put("name", new String("miro" ) );
-		htblColNameValue.put("area", new String("(0,0),(0,0),(0,0),(0,0)") );
-		dbApp.insertIntoTable( strTableName , htblColNameValue );
-		}
-		
-	  
-		SQLTerm[] arrSQLTerms;
-		arrSQLTerms = new SQLTerm[2];
-		int i=0;
-		while( i<2) {
-			arrSQLTerms[i]=new SQLTerm();
-		i++;
-		}
-		arrSQLTerms[0]._strTableName = "gay";
-		arrSQLTerms[0]._strColumnName= "id";
-		arrSQLTerms[0]._strOperator = "<";//=,<=,>=,>,<
-		arrSQLTerms[0]._objValue = new Integer(5);
-		arrSQLTerms[1]._strTableName = "gay";
-		arrSQLTerms[1]._strColumnName= "id";
-		arrSQLTerms[1]._strOperator = ">";
-		arrSQLTerms[1]._objValue = new Integer(2);
-		String[]strarrOperators = new String[1];
-		strarrOperators[0] = "AND";
-	
-		
-		Iterator result=dbApp.selectFromTable(arrSQLTerms , strarrOperators);
-		
-		while(result.hasNext()) {
-			System.out.println(result.next());
-		}
-		
-		*/
-
-	//-------------------------------------CreateBPlustree Testing-----------------------------------------------	
-		
 		String strTableName = "gay";
 		DBApp dbApp = new DBApp( );
 		dbApp.init();
@@ -119,8 +69,64 @@ public class DBAppTest {
 		
 		*/
 		// run this loop multiple times to get duplicate records
-		// u can change some elements in the loop to have different records
+		// u can change some elements in the loop to have difrrent records
+		
+		/*
 		Hashtable htblColNameValue ;
+		for(int i=0;i<25;i++) {
+		htblColNameValue = new Hashtable( );
+		htblColNameValue.put("id", new Integer( i ));
+		htblColNameValue.put("name", new String("miro" ) );
+		htblColNameValue.put("area", new String("(0,0),(0,0),(0,0),(0,0)") );
+		dbApp.insertIntoTable( strTableName , htblColNameValue );
+		}
+		*/
+		//dbApp.createBTreeIndex(strTableName, "id");
+		
+		SQLTerm[] arrSQLTerms;
+		arrSQLTerms = new SQLTerm[2];
+		int i=0;
+		while( i<2) {
+			arrSQLTerms[i]=new SQLTerm();
+		i++;
+		}
+		arrSQLTerms[0]._strTableName = "gay";
+		arrSQLTerms[0]._strColumnName= "id";
+		arrSQLTerms[0]._strOperator = ">=";//=,<=,>=,>,<
+		arrSQLTerms[0]._objValue = new Integer(5);
+		arrSQLTerms[1]._strTableName = "gay";
+		arrSQLTerms[1]._strColumnName= "id";
+		arrSQLTerms[1]._strOperator = "<";
+		arrSQLTerms[1]._objValue = new Integer(10);
+		String[]strarrOperators = new String[1];
+		strarrOperators[0] = "XOR";
+	
+		
+		Iterator result=dbApp.selectFromTable(arrSQLTerms , strarrOperators);
+		
+		while(result.hasNext()) {
+			System.out.println(result.next());
+		}
+		
+		
+
+	//-------------------------------------CreateBPlustree Testing-----------------------------------------------	
+		
+	/*	String strTableName = "gay";
+		DBApp dbApp = new DBApp( );
+		dbApp.init();
+		
+		/*
+		Hashtable htblColNameType = new Hashtable( );
+		htblColNameType.put("id", "java.lang.Integer");
+	    htblColNameType.put("name", "java.lang.String");
+		htblColNameType.put("area", "java.awt.Polygon");
+		dbApp.createTable( strTableName, "id", htblColNameType );
+		
+		*/
+		// run this loop multiple times to get duplicate records
+		// u can change some elements in the loop to have different records
+	//	Hashtable htblColNameValue ; 
 		/*
 		for(int i=0;i<25;i++) {
 		htblColNameValue = new Hashtable( );
