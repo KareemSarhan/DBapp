@@ -1899,6 +1899,8 @@ public class DBApp <T extends Comparable<T>> {
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public  Vector selectHelper(String tableName, String colName, String operator, Object value) throws DBAppException {
+		
+		try {
 		Vector results=new Vector();
 		
 		// *check if the column is indexed
@@ -1988,7 +1990,12 @@ public class DBApp <T extends Comparable<T>> {
 		
 		
 		
+		
 		return results;
+		}
+		catch(Exception e) {
+			throw new DBAppException("Something went wrong with select helper");
+		}
 	}
 	
 	
