@@ -105,42 +105,39 @@ public class DBApp <T extends Comparable<T>> {
   // then creates a .class file with the table object in it
   // the file is named after the table
 
-  //
-  // done
-  // this checks the consisity of data
-  /////////////////////////////////////////////////
+  
 
   public boolean check(Object data, String datatype) throws DBAppException {
     if (datatype.equals("java.lang.Integer")) {
       if (data instanceof Integer) {
-        // System.out.println("fvfgv1");
+        
         return true;
       } else {
-        // System.out.println("fvfgv1");
+        
         return false;
       }
     } else if (datatype.equals("java.lang.Double")) {
       if (data instanceof Double) {
         return true;
-      } else { // System.out.println("fvfgv2");
+      } else { 
         return false;
       }
     } else if (datatype.equals("java.lang.Boolean")) {
       if (data instanceof Boolean) {
         return true;
-      } else { // System.out.println("fvfgv3");
+      } else { 
         return false;
       }
     } else if (datatype.equals("java.lang.String")) {
       if (data instanceof String) {
         return true;
-      } else { // System.out.println("fvfgv4");
+      } else { 
         return false;
       }
     } else if (datatype.equals("java.lang.Date")) {
       if (data instanceof Date) {
         return true;
-      } else { // System.out.println("fvfgv5");
+      } else { 
         return false;
       }
     } else {
@@ -152,7 +149,7 @@ public class DBApp <T extends Comparable<T>> {
   //
   // done
   // takes a table and hash table and checks that the fields are correct
-  /////////////////////////////////////////////////
+  
   public boolean missorins(Table table, Hashtable<String, Object> htblColNameValue) throws DBAppException {
     for (int i = 0; i < table.getColoumn_names().size() - 1; i++) {
       Object o = htblColNameValue.get(table.getColoumn_names().get(i));
@@ -184,8 +181,7 @@ public class DBApp <T extends Comparable<T>> {
   }
 
   // gets the pages references of a table
-  ///
-  //////////////////////////////////////////
+  
   public static Vector deserilizetable(String tblname) {
     Vector result = new Vector();
     try {
@@ -205,8 +201,7 @@ public class DBApp <T extends Comparable<T>> {
       result.add(num);
       return result;
     }
-    ///////////////////////////////////////////
-    ////////////////////////////////////////////// main methods
+    
   }
 
   public void createTable(String strTableName, String strClusteringKeyColumn, Hashtable<String, String> htblColNameType)
@@ -278,7 +273,7 @@ public class DBApp <T extends Comparable<T>> {
     // or leave it empty if there is no code you want to
     // execute at application startup
     // creates the metadata file if its not already there
-    //System.out.println("Working Directory = " + System.getProperty("user.dir"));
+    
     File myfile = new File("data/metadata.csv");
     if (myfile.createNewFile()) { // checking if the metadata file is there or not
       String s = "Table Name,Column Name,Column Type,Key,Indexed\n";
@@ -890,7 +885,7 @@ public class DBApp <T extends Comparable<T>> {
     if (this.missorins(table, htblColNameValue) == true) {
       throw (new DBAppException("missing or inconsisitant data"));
     } else {
-      // System.out.println("done");
+      
       Vector record = new Vector();
       for (int i = 0; i < table.getIskey().size(); i++) {
         if (table.getIskey().get(i) == true) {
@@ -1676,8 +1671,6 @@ public class DBApp <T extends Comparable<T>> {
 				if(moveleft>-1)
 					record=(Vector)page.get(moveleft);
 			}
-			
-			
 			
 			}
 			

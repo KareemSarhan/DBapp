@@ -1,4 +1,4 @@
-package BPTree;
+package RTree;
 
 
 
@@ -7,23 +7,23 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Vector;
 
-public class BPTree<T extends Comparable<T>> implements Serializable{
+public class RTree<T extends Comparable<T>> implements Serializable{
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	private int order;
-	private BPTreeNode<T> root;
+	private RTreeNode<T> root;
 	
 	/**
 	 * Creates an empty B+ tree
 	 * @param order the maximum number of keys in the nodes of the tree
 	 */
-	public BPTree(int order) 
+	public RTree(int order) 
 	{
 		this.order = order;
-		root = new BPTreeLeafNode<T>(this.order);
+		root = new RTreeLeafNode<T>(this.order);
 		root.setRoot(true);
 	}
 	
@@ -37,7 +37,7 @@ public class BPTree<T extends Comparable<T>> implements Serializable{
 		PushUp<T> pushUp = root.insert(key, recordReference, null, -1);
 		if(pushUp != null)
 		{
-			BPTreeInnerNode<T> newRoot = new BPTreeInnerNode<T>(order);
+			RTreeInnerNode<T> newRoot = new RTreeInnerNode<T>(order);
 			newRoot.insertLeftAt(0, pushUp.key, root);
 			newRoot.setChild(1, pushUp.newNode);
 			root.setRoot(false);
@@ -67,8 +67,8 @@ public class BPTree<T extends Comparable<T>> implements Serializable{
 	{
 		boolean done = root.delete(key, null, -1);
 		//go down and find the new root in case the old root is deleted
-		while(root instanceof BPTreeInnerNode && !root.isRoot())
-			root = ((BPTreeInnerNode<T>) root).getFirstChild();
+		while(root instanceof RTreeInnerNode && !root.isRoot())
+			root = ((RTreeInnerNode<T>) root).getFirstChild();
 		return done;
 	}
 	
@@ -81,21 +81,21 @@ public class BPTree<T extends Comparable<T>> implements Serializable{
 		//	<For Testing>
 		// node :  (id)[k1|k2|k3|k4]{P1,P2,P3,}
 		String s = "";
-		Queue<BPTreeNode<T>> cur = new LinkedList<BPTreeNode<T>>(), next;
+		Queue<RTreeNode<T>> cur = new LinkedList<RTreeNode<T>>(), next;
 		cur.add(root);
 		while(!cur.isEmpty())
 		{
-			next = new LinkedList<BPTreeNode<T>>();
+			next = new LinkedList<RTreeNode<T>>();
 			while(!cur.isEmpty())
 			{
-				BPTreeNode<T> curNode = cur.remove();
+				RTreeNode<T> curNode = cur.remove();
 				System.out.print(curNode);
-				if(curNode instanceof BPTreeLeafNode)
+				if(curNode instanceof RTreeLeafNode)
 					System.out.print("->");
 				else
 				{
 					System.out.print("{");
-					BPTreeInnerNode<T> parent = (BPTreeInnerNode<T>) curNode;
+					RTreeInnerNode<T> parent = (RTreeInnerNode<T>) curNode;
 					for(int i = 0; i <= parent.numberOfKeys; ++i)
 					{
 						System.out.print(parent.getChild(i).index+",");
@@ -114,7 +114,7 @@ public class BPTree<T extends Comparable<T>> implements Serializable{
 	
 	@SuppressWarnings({ "unused" })
 	public Vector<Vector<Integer>> searchAll(T key) {
-		BPTree<T> tito=this;
+		RTree<T> tito=this;
 		Vector<Vector<Integer>> indexes=new Vector<Vector<Integer>>();
 		
 		int page;
@@ -136,20 +136,20 @@ public class BPTree<T extends Comparable<T>> implements Serializable{
 	
 	
 	public Vector<Vector<Integer>> getLessThan(T value) {
-		BPTree<T> tito=this;
+		RTree<T> tito=this;
 		
 		Vector<Vector<Integer>> indexes=new Vector<Vector<Integer>>();
-		BPTreeNode<T> curNode = tito.root;
+		RTreeNode<T> curNode = tito.root;
 		
 		
-		while(curNode instanceof BPTreeInnerNode) {
-			BPTreeInnerNode<T> parent = (BPTreeInnerNode<T>) curNode;
+		while(curNode instanceof RTreeInnerNode) {
+			RTreeInnerNode<T> parent = (RTreeInnerNode<T>) curNode;
 			curNode=parent.getFirstChild();
 			
 		}
 		boolean flag=true;
 		// *got first leaf
-		BPTreeLeafNode<T> leaf=(BPTreeLeafNode)curNode;
+		RTreeLeafNode<T> leaf=(RTreeLeafNode)curNode;
 		
 		
 		while(leaf.getNext()!=null) {
@@ -177,20 +177,20 @@ public class BPTree<T extends Comparable<T>> implements Serializable{
 	
 	}
 	public Vector<Vector<Integer>> getLessThanOrEqual(T value) {
-		BPTree<T> tito=this;
+		RTree<T> tito=this;
 		
 		Vector<Vector<Integer>> indexes=new Vector<Vector<Integer>>();
-		BPTreeNode<T> curNode = tito.root;
+		RTreeNode<T> curNode = tito.root;
 		
 		
-		while(curNode instanceof BPTreeInnerNode) {
-			BPTreeInnerNode<T> parent = (BPTreeInnerNode<T>) curNode;
+		while(curNode instanceof RTreeInnerNode) {
+			RTreeInnerNode<T> parent = (RTreeInnerNode<T>) curNode;
 			curNode=parent.getFirstChild();
 			
 		}
 		boolean flag=true;
 		// *got first leaf
-		BPTreeLeafNode<T> leaf=(BPTreeLeafNode)curNode;
+		RTreeLeafNode<T> leaf=(RTreeLeafNode)curNode;
 		
 		
 		while(leaf.getNext()!=null) {
@@ -220,20 +220,20 @@ public class BPTree<T extends Comparable<T>> implements Serializable{
 	
 	public Vector<Vector<Integer>> getMoreThan(T value){
 		
-		BPTree<T> tito=this;
+		RTree<T> tito=this;
 		
 		Vector<Vector<Integer>> indexes=new Vector<Vector<Integer>>();
-		BPTreeNode<T> curNode = tito.root;
+		RTreeNode<T> curNode = tito.root;
 		
 		
-		while(curNode instanceof BPTreeInnerNode) {
-			BPTreeInnerNode<T> parent = (BPTreeInnerNode<T>) curNode;
+		while(curNode instanceof RTreeInnerNode) {
+			RTreeInnerNode<T> parent = (RTreeInnerNode<T>) curNode;
 			curNode=parent.getFirstChild();
 			
 		}
 		boolean flag=true;
 		// *got first leaf
-		BPTreeLeafNode<T> leaf=(BPTreeLeafNode)curNode;
+		RTreeLeafNode<T> leaf=(RTreeLeafNode)curNode;
 		
 		
 		while(leaf.getNext()!=null) {
@@ -261,20 +261,20 @@ public class BPTree<T extends Comparable<T>> implements Serializable{
 	
 	public Vector<Vector<Integer>> getMoreThanOrEqual(T value){
 		
-		BPTree<T> tito=this;
+		RTree<T> tito=this;
 		
 		Vector<Vector<Integer>> indexes=new Vector<Vector<Integer>>();
-		BPTreeNode<T> curNode = tito.root;
+		RTreeNode<T> curNode = tito.root;
 		
 		
-		while(curNode instanceof BPTreeInnerNode) {
-			BPTreeInnerNode<T> parent = (BPTreeInnerNode<T>) curNode;
+		while(curNode instanceof RTreeInnerNode) {
+			RTreeInnerNode<T> parent = (RTreeInnerNode<T>) curNode;
 			curNode=parent.getFirstChild();
 			
 		}
 		boolean flag=true;
 		// *got first leaf
-		BPTreeLeafNode<T> leaf=(BPTreeLeafNode)curNode;
+		RTreeLeafNode<T> leaf=(RTreeLeafNode)curNode;
 		
 		
 		while(leaf.getNext()!=null) {
@@ -303,20 +303,20 @@ public class BPTree<T extends Comparable<T>> implements Serializable{
 	
 	public Vector<Vector<Integer>> getNotEqual(T value){
 		
-		BPTree<T> tito=this;
+		RTree<T> tito=this;
 		
 		Vector<Vector<Integer>> indexes=new Vector<Vector<Integer>>();
-		BPTreeNode<T> curNode = tito.root;
+		RTreeNode<T> curNode = tito.root;
 		
 		
-		while(curNode instanceof BPTreeInnerNode) {
-			BPTreeInnerNode<T> parent = (BPTreeInnerNode<T>) curNode;
+		while(curNode instanceof RTreeInnerNode) {
+			RTreeInnerNode<T> parent = (RTreeInnerNode<T>) curNode;
 			curNode=parent.getFirstChild();
 			
 		}
 		boolean flag=true;
 		// *got first leaf
-		BPTreeLeafNode<T> leaf=(BPTreeLeafNode)curNode;
+		RTreeLeafNode<T> leaf=(RTreeLeafNode)curNode;
 		
 		
 		while(leaf.getNext()!=null) {
@@ -341,49 +341,6 @@ public class BPTree<T extends Comparable<T>> implements Serializable{
 			
 		return indexes;
 	}
-	
-	
-	public int[] wezwez(T key) {
-		int [] index=null;
-		
-		
-		BPTree<T> tito=this;
-		
-		Vector<Vector<Integer>> indexes=new Vector<Vector<Integer>>();
-		BPTreeNode<T> curNode = tito.root;
-		
-		
-		while(curNode instanceof BPTreeInnerNode) {
-			BPTreeInnerNode<T> parent = (BPTreeInnerNode<T>) curNode;
-			curNode=parent.getFirstChild();
-			
-		}
-		boolean flag=true;
-		// *got first leaf
-		BPTreeLeafNode<T> leaf=(BPTreeLeafNode)curNode;
-		
-		
-		while(leaf.getNext()!=null) {
-			Comparable<T>[] keys=leaf.keys;
-			
-			for(int i=0;i<keys.length;i++) {
-				
-				if(keys[i].compareTo(key)>0) {
-					Ref ref=tito.search(key);
-					index[0]=ref.getPage();
-					index[1]=ref.getIndexInPage();
-				}
-				
-			}
-			leaf=leaf.getNext();
-		}
-		return index;
-		
-	}
-	
-	
-	
-	
 	
 	
 }
