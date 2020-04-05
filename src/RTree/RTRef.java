@@ -2,7 +2,7 @@ package RTree;
 
 import java.io.Serializable;
 
-public class Ref implements Serializable{
+public class RTRef implements Serializable{
 	
 	/**
 	 * This class represents a pointer to the record. It is used at the leaves of the B+ tree 
@@ -10,7 +10,7 @@ public class Ref implements Serializable{
 	private static final long serialVersionUID = 1L;
 	private int pageNo, indexInPage;
 	
-	public Ref(int pageNo, int indexInPage)
+	public RTRef(int pageNo, int indexInPage)
 	{
 		this.pageNo = pageNo;
 		this.indexInPage = indexInPage;

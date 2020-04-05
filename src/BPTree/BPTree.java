@@ -112,6 +112,7 @@ public class BPTree<T extends Comparable<T>> implements Serializable{
 		return s;
 	}
 	
+	
 	@SuppressWarnings({ "unused" })
 	public Vector<Vector<Integer>> searchAll(T key) {
 		BPTree<T> tito=this;
@@ -135,7 +136,9 @@ public class BPTree<T extends Comparable<T>> implements Serializable{
 	}
 	
 	
+	
 	public Vector<Vector<Integer>> getLessThan(T value) {
+
 		BPTree<T> tito=this;
 		
 		Vector<Vector<Integer>> indexes=new Vector<Vector<Integer>>();
@@ -176,6 +179,8 @@ public class BPTree<T extends Comparable<T>> implements Serializable{
 		
 	
 	}
+	
+	
 	public Vector<Vector<Integer>> getLessThanOrEqual(T value) {
 		BPTree<T> tito=this;
 		
@@ -218,6 +223,7 @@ public class BPTree<T extends Comparable<T>> implements Serializable{
 	
 	}
 	
+	
 	public Vector<Vector<Integer>> getMoreThan(T value){
 		
 		BPTree<T> tito=this;
@@ -258,6 +264,7 @@ public class BPTree<T extends Comparable<T>> implements Serializable{
 			
 		return indexes;
 	}
+	
 	
 	public Vector<Vector<Integer>> getMoreThanOrEqual(T value){
 		
@@ -344,7 +351,7 @@ public class BPTree<T extends Comparable<T>> implements Serializable{
 	
 	
 	public int[] wezwez(T key) {
-		int [] index=null;
+		int [] index= {-1,-1};
 		
 		
 		BPTree<T> tito=this;
@@ -360,6 +367,7 @@ public class BPTree<T extends Comparable<T>> implements Serializable{
 		}
 		boolean flag=true;
 		// *got first leaf
+		
 		BPTreeLeafNode<T> leaf=(BPTreeLeafNode)curNode;
 		
 		
@@ -367,17 +375,19 @@ public class BPTree<T extends Comparable<T>> implements Serializable{
 			Comparable<T>[] keys=leaf.keys;
 			
 			for(int i=0;i<keys.length;i++) {
-				
+				//System.out.print(keys[i]+" ");
 				if(keys[i].compareTo(key)>0) {
+					
 					Ref ref=tito.search(key);
 					index[0]=ref.getPage();
 					index[1]=ref.getIndexInPage();
+					return index;
 				}
 				
 			}
 			leaf=leaf.getNext();
 		}
-		return index;
+		return null;
 		
 	}
 	

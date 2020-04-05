@@ -8,7 +8,7 @@ public class RTreeLeafNode<T extends Comparable<T>> extends RTreeNode<T> impleme
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private Ref[] records;
+	private RTRef[] records;
 	private RTreeLeafNode<T> next;
 	
 	@SuppressWarnings("unchecked")
@@ -16,7 +16,7 @@ public class RTreeLeafNode<T extends Comparable<T>> extends RTreeNode<T> impleme
 	{
 		super(n);
 		keys = new Comparable[n];
-		records = new Ref[n];
+		records = new RTRef[n];
 
 	}
 	
@@ -41,7 +41,7 @@ public class RTreeLeafNode<T extends Comparable<T>> extends RTreeNode<T> impleme
 	 * @param index the index to find its record
 	 * @return the reference of the queried index
 	 */
-	public Ref getRecord(int index) 
+	public RTRef getRecord(int index) 
 	{
 		return records[index];
 	}
@@ -51,7 +51,7 @@ public class RTreeLeafNode<T extends Comparable<T>> extends RTreeNode<T> impleme
 	 * @param index the index to set the value at
 	 * @param recordReference the reference to the record
 	 */
-	public void setRecord(int index, Ref recordReference) 
+	public void setRecord(int index, RTRef recordReference) 
 	{
 		records[index] = recordReference;
 	}
@@ -59,7 +59,7 @@ public class RTreeLeafNode<T extends Comparable<T>> extends RTreeNode<T> impleme
 	/**
 	 * @return the reference of the first record
 	 */
-	public Ref getFirstRecord()
+	public RTRef getFirstRecord()
 	{
 		return records[0];
 	}
@@ -67,7 +67,7 @@ public class RTreeLeafNode<T extends Comparable<T>> extends RTreeNode<T> impleme
 	/**
 	 * @return the reference of the last record
 	 */
-	public Ref getLastRecord()
+	public RTRef getLastRecord()
 	{
 		return records[numberOfKeys-1];
 	}
@@ -85,7 +85,7 @@ public class RTreeLeafNode<T extends Comparable<T>> extends RTreeNode<T> impleme
 	/**
 	 * insert the specified key associated with a given record refernce in the B+ tree
 	 */
-	public PushUp<T> insert(T key, Ref recordReference, RTreeInnerNode<T> parent, int ptr)
+	public PushUp<T> insert(T key, RTRef recordReference, RTreeInnerNode<T> parent, int ptr)
 	{
 		if(this.isFull())
 		{
@@ -109,7 +109,7 @@ public class RTreeLeafNode<T extends Comparable<T>> extends RTreeNode<T> impleme
 	 * @param key the key to be inserted
 	 * @param recordReference the pointer to the record associated with the key
 	 */
-	private void insertAt(int index, Comparable<T> key, Ref recordReference) 
+	private void insertAt(int index, Comparable<T> key, RTRef recordReference) 
 	{
 		for (int i = numberOfKeys - 1; i >= index; --i) 
 		{
@@ -128,7 +128,7 @@ public class RTreeLeafNode<T extends Comparable<T>> extends RTreeNode<T> impleme
 	 * @param recordReference the reference of the new key
 	 * @return the new node that results from the split
 	 */
-	public RTreeNode<T> split(T key, Ref recordReference) 
+	public RTreeNode<T> split(T key, RTRef recordReference) 
 	{
 		int keyIndex = this.findIndex(key);
 		int midIndex = numberOfKeys / 2;
@@ -178,7 +178,7 @@ public class RTreeLeafNode<T extends Comparable<T>> extends RTreeNode<T> impleme
 	 * returns the record reference with the passed key and null if does not exist
 	 */
 	@Override
-	public Ref search(T key) 
+	public RTRef search(T key) 
 	{
 		for(int i = 0; i < numberOfKeys; ++i)
 			if(this.getKey(i).compareTo(key) == 0)

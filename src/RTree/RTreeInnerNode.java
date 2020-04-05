@@ -65,12 +65,12 @@ public class RTreeInnerNode<T extends Comparable<T>> extends RTreeNode<T>  imple
 	/**
 	 * insert given key in the corresponding index.
 	 * @param key key to be inserted
-	 * @param Ref reference which that inserted key is located
+	 * @param RTRef reference which that inserted key is located
 	 * @param parent parent of that inserted node
 	 * @param ptr index of pointer in the parent node pointing to the current node
 	 * @return value to be pushed up to the parent.
 	 */
-	public PushUp<T> insert(T key, Ref recordReference, RTreeInnerNode<T> parent, int ptr)
+	public PushUp<T> insert(T key, RTRef recordReference, RTreeInnerNode<T> parent, int ptr)
 	{
 		int index = findIndex(key);
 		PushUp<T> pushUp = children[index].insert(key, recordReference, this, index);
@@ -300,7 +300,7 @@ public class RTreeInnerNode<T extends Comparable<T>> extends RTreeNode<T>  imple
 	 * searches for the record reference of the specified key
 	 */
 	@Override
-	public Ref search(T key) 
+	public RTRef search(T key) 
 	{
 		return children[findIndex(key)].search(key);
 	}

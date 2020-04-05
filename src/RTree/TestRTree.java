@@ -6,19 +6,13 @@ import java.util.Vector;
 
 public class TestRTree {
 	@SuppressWarnings("unused")
-	private static Ref r;
+	private static RTRef r;
 	private static  int c=0;
 	public static void main(String[] args) 
 	{	
 		RTree<Integer> tree = new RTree<Integer>(2);
 	
-		tree.insert(3, new Ref(1,2));
-		tree.insert(3, new Ref(1,4));
-		tree.insert(3, new Ref(6,6));
-		tree.insert(3, new Ref(64,4));
-		tree.insert(3, new Ref(23,9));
-		tree.insert(3, new Ref(0,9));
-		tree.insert(3, new Ref(33,15));
+		
 	/*	Vector<int[]> v=tree.searchAll(3);
 		
 		for (int i = 0; i <v.size(); i++) {

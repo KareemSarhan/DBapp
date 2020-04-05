@@ -96,9 +96,9 @@ public abstract class RTreeNode<T extends Comparable<T>> implements Serializable
 	 * @param ptr the index of the parent pointer that points to this node
 	 * @return a key and a new node in case of a node splitting and null otherwise
 	 */
-	public abstract PushUp<T> insert(T key, Ref recordReference, RTreeInnerNode<T> parent, int ptr);
+	public abstract PushUp<T> insert(T key, RTRef recordReference, RTreeInnerNode<T> parent, int ptr);
 	
-	public abstract Ref search(T key);
+	public abstract RTRef search(T key);
 
 	/**
 	 * delete a key from the B+ tree recursively

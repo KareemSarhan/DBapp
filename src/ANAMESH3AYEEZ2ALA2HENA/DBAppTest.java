@@ -6,12 +6,13 @@ import java.util.Hashtable;
 import java.util.Iterator;
 
 import BPTree.BPTree;
+import RTree.RTree;
 
 @SuppressWarnings("all")
 
 public class DBAppTest {
 
-	public static void main(String[] args) throws IOException, DBAppException {
+	public static<T extends Comparable<T>> void main(String[] args) throws Exception {
 	//	System.out.println("balabizo");
 		//String strTableName = "test";
 		//DBApp dbApp = new DBApp();
@@ -102,13 +103,22 @@ public class DBAppTest {
 		arrSQLTerms[1]._objValue = new Integer(10);
 		String[]strarrOperators = new String[1];
 		strarrOperators[0] = "XOR";
-	
+		// lazem te check tab3an hal el column da indexed wala la2
+		//then check law howa polygon 3ashan law ah hate3mel Rtree be nafs kol 7aga
+		
+		// ha create bplus tree be generic type
+		BPTree<T> tree=(BPTree<T>) dbApp.getBPlusTree(strTableName,"id");
+		//ba3d keda ha search el tree 
+		//lazem te type cast ma3lesh we lazem Integer mesh int we new Double we keda matensash te type
+		Object v=new Integer(17);
+		System.out.println(tree.wezwez((T)v)[0]+" "+tree.wezwez((T)v)[1]);
+		//[0] Di el page fel page refrence we [1] di el index
 		
 		Iterator result=dbApp.selectFromTable(arrSQLTerms , strarrOperators);
 		
-		while(result.hasNext()) {
-			System.out.println(result.next());
-		}
+		//while(result.hasNext()) {
+		//	System.out.println(result.next());
+	//	}
 		
 		
 
@@ -145,7 +155,17 @@ public class DBAppTest {
 		
 	//	System.out.println(b.searchAll("miro"));
 		
-		
+		//dbApp.createRTreeIndex(strTableName, "area");
+		RTree<T> r=dbApp.getRTree(strTableName, "area");
+		System.out.println(r);
+		Hashtable htblColNameValue = new Hashtable( );
+		htblColNameValue.put("id", new Integer( i ));
+		htblColNameValue.put("name", new String("miro" ) );
+		htblColNameValue.put("area", new String("(0,3),(0,5),(4,9),(12,0)") );
+		dbApp.insertIntoTable( strTableName , htblColNameValue );
+		dbApp.refreshRTree(strTableName, "area");
+		r=dbApp.getRTree(strTableName, "area");
+		System.out.println(r);
 		
 	}
 

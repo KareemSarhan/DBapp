@@ -7,6 +7,10 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Vector;
 
+
+
+
+
 public class RTree<T extends Comparable<T>> implements Serializable{
 
 	/**
@@ -32,7 +36,7 @@ public class RTree<T extends Comparable<T>> implements Serializable{
 	 * @param key the key to be inserted
 	 * @param recordReference the reference of the record associated with the key
 	 */
-	public void insert(T key, Ref recordReference)
+	public void insert(T key, RTRef recordReference)
 	{
 		PushUp<T> pushUp = root.insert(key, recordReference, null, -1);
 		if(pushUp != null)
@@ -52,7 +56,7 @@ public class RTree<T extends Comparable<T>> implements Serializable{
 	 * @param key the key to find its record
 	 * @return the reference of the record associated with this key 
 	 */
-	public Ref search(T key)
+	public RTRef search(T key)
 	{
 		return root.search(key);
 	}
@@ -120,7 +124,7 @@ public class RTree<T extends Comparable<T>> implements Serializable{
 		int page;
 		int place;
 		while(tito.search(key)!=null) {
-			Ref r;
+			RTRef r;
 			Vector<Integer> b2=new Vector<Integer>();
 			r=tito.search(key);
 			tito.delete(key);
@@ -341,6 +345,47 @@ public class RTree<T extends Comparable<T>> implements Serializable{
 			
 		return indexes;
 	}
+	public int[] wezwez(T key) {
+		int [] index= {-1,-1};
+		
+		
+		RTree<T> tito=this;
+		
+		Vector<Vector<Integer>> indexes=new Vector<Vector<Integer>>();
+		RTreeNode<T> curNode = tito.root;
+		
+		
+		while(curNode instanceof RTreeInnerNode) {
+			RTreeInnerNode<T> parent = (RTreeInnerNode<T>) curNode;
+			curNode=parent.getFirstChild();
+			
+		}
+		boolean flag=true;
+		// *got first leaf
+		
+		RTreeLeafNode<T> leaf=(RTreeLeafNode)curNode;
+		
+		
+		while(leaf.getNext()!=null) {
+			Comparable<T>[] keys=leaf.keys;
+			
+			for(int i=0;i<keys.length;i++) {
+				//System.out.print(keys[i]+" ");
+				if(keys[i].compareTo(key)>0) {
+					
+					RTRef ref=tito.search(key);
+					index[0]=ref.getPage();
+					index[1]=ref.getIndexInPage();
+					return index;
+				}
+				
+			}
+			leaf=leaf.getNext();
+		}
+		return null;
+		
+	}
+	
 	
 	
 }
