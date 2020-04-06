@@ -28,6 +28,8 @@ import java.util.Vector;
 
 import BPTree.BPTree;
 import BPTree.Ref;
+import RTree.RTRef;
+import RTree.RTree;
 
 
 
@@ -40,7 +42,7 @@ import BPTree.Ref;
 
 //TODO: Please delete all system.out.print and all system.out.print comments
 
-public class DBApp {
+public class DBApp <T extends Comparable<T>> {
 
   public DBApp() {
   }
@@ -105,42 +107,39 @@ public class DBApp {
   // then creates a .class file with the table object in it
   // the file is named after the table
 
-  //
-  // done
-  // this checks the consisity of data
-  /////////////////////////////////////////////////
+  
 
   public boolean check(Object data, String datatype) throws DBAppException {
     if (datatype.equals("java.lang.Integer")) {
       if (data instanceof Integer) {
-        // System.out.println("fvfgv1");
+        
         return true;
       } else {
-        // System.out.println("fvfgv1");
+        
         return false;
       }
     } else if (datatype.equals("java.lang.Double")) {
       if (data instanceof Double) {
         return true;
-      } else { // System.out.println("fvfgv2");
+      } else { 
         return false;
       }
     } else if (datatype.equals("java.lang.Boolean")) {
       if (data instanceof Boolean) {
         return true;
-      } else { // System.out.println("fvfgv3");
+      } else { 
         return false;
       }
     } else if (datatype.equals("java.lang.String")) {
       if (data instanceof String) {
         return true;
-      } else { // System.out.println("fvfgv4");
+      } else { 
         return false;
       }
     } else if (datatype.equals("java.lang.Date")) {
       if (data instanceof Date) {
         return true;
-      } else { // System.out.println("fvfgv5");
+      } else { 
         return false;
       }
     } else {
@@ -152,7 +151,7 @@ public class DBApp {
   //
   // done
   // takes a table and hash table and checks that the fields are correct
-  /////////////////////////////////////////////////
+  
   public boolean missorins(Table table, Hashtable<String, Object> htblColNameValue) throws DBAppException {
     for (int i = 0; i < table.getColoumn_names().size() - 1; i++) {
       Object o = htblColNameValue.get(table.getColoumn_names().get(i));
@@ -184,8 +183,7 @@ public class DBApp {
   }
 
   // gets the pages references of a table
-  ///
-  //////////////////////////////////////////
+  
   public static Vector deserilizetable(String tblname) {
     Vector result = new Vector();
     try {
@@ -205,8 +203,7 @@ public class DBApp {
       result.add(num);
       return result;
     }
-    ///////////////////////////////////////////
-    ////////////////////////////////////////////// main methods
+    
   }
 
   public void createTable(String strTableName, String strClusteringKeyColumn, Hashtable<String, String> htblColNameType)
@@ -278,7 +275,7 @@ public class DBApp {
     // or leave it empty if there is no code you want to
     // execute at application startup
     // creates the metadata file if its not already there
-    //System.out.println("Working Directory = " + System.getProperty("user.dir"));
+    
     File myfile = new File("data/metadata.csv");
     if (myfile.createNewFile()) { // checking if the metadata file is there or not
       String s = "Table Name,Column Name,Column Type,Key,Indexed\n";
@@ -288,6 +285,35 @@ public class DBApp {
       writer.close();
     }
   }
+  
+  
+  public RTree<T> getRTree(String strTableName,String strColName)throws Exception{
+	  RTree<T> o=new RTree<T>(3);
+	  try
+      {    
+          // Reading the object from a file 
+          FileInputStream file = new FileInputStream("data/"+strTableName+strColName); 
+          ObjectInputStream in = new ObjectInputStream(file); 
+            
+          // Method for deserialization of object 
+          o = (RTree<T>)in.readObject(); 
+            
+          in.close(); 
+          file.close(); 
+ 
+      } 
+        
+      catch(Exception ex) {
+    	throw ex; 
+      }
+	  return o;
+	  
+	  
+  }
+  
+  
+  
+  
   
   
   public Object getBPlusTree(String strTableName,String strColName) throws DBAppException{
@@ -317,7 +343,106 @@ public class DBApp {
   }
   
   
+  public void refreshRTree(String strTableName,String strColName) throws DBAppException{
+	  
+	  //* load table object 
+	  Table table=this.loadTable(strTableName);
+	  Vector rest=this.deserilizetable(strTableName);
+	  table.setPagesreferences((List<String>) rest.get(0));
+	  table.setNumofcreatedpages((int)rest.get(1));
+	  // *get the type of the column and parse the value into it
+	  int colIndex=-1;
+	 for (int i = 0; i < table.getColoumn_names().size(); i++) {
+		  if(table.getColoumn_names().get(i).equals(strColName)) {
+			  colIndex=i;
+			  break;
+		  }
+	  	}
+	  //* get the type of the column to create the tree with the same type
+	  String colType=table.getDatatype().get(colIndex);
+	  int treeOrder=0;
+	  // java.lang.Integer, java.lang.String,
+	  //java.lang.Double, java.lang.Boolean, java.util.Date and java.awt.Polygon
+	  
+	  
+	  // * this will go to the properties file to get the maximum node size :D
+	  try (InputStream input = new FileInputStream("config/DBApp.properties")) {
+
+			Properties prop = new Properties();
+
+			// load a properties
+
+			prop.load(input);
+
+			// get the property value and print it out
+			
+			treeOrder= Integer.parseInt(prop.getProperty("NodeSize")) ;
+		} catch (IOException ex) {
+			throw new DBAppException("Error with properties file");
+		}
+	  
+	  if(colType.contentEquals("java.awt.Polygon")) {
+		  // *create a BPlus tree with Integer type
+		  RTree<Integer> t1=new RTree<Integer>(treeOrder);
+		  
+		  // *Loop over each page in the table
+		  for(int i=0;i<table.getPagesreferences().size();i++) {
+			
+			  // *create page object for each page
+			  Page page=table.read_page(table.getPagesreferences().get(i));
+			  
+			  // *loop over each record in the page and insert it in the tree with its respective place
+			  Vector<Vector> recordss=page.RecordsGetter();
+			  
+			  for(int j=0;j<recordss.size();j++) {
+				  
+				  // *create vector record 
+				  Vector record=recordss.get(j);
+				  
+				  // *insert the respective column key with its position
+				  Object u=record.get(colIndex);
+				  Integer h= u instanceof Polygon? getPolyArea((Polygon)u):getPolyArea((String)u);
+				  t1.insert(h, new RTRef(i, j));
+				  
+			  }
+			  
+		  }
+		
+		 
+		 // *now we are done with creating the tree and need to serialize it into a file :D	 
+		 
+		 try {
+			  File file=new File("data/"+strTableName+strColName);
+			  
+			  //Saving of object in a file 
+	          FileOutputStream fo = new FileOutputStream(file); 
+	          ObjectOutputStream out = new ObjectOutputStream(fo); 
+	          
+	          // Method for serialization of object 
+	          out.writeObject(t1); 
+	            
+	          out.close(); 
+	          fo.close(); 
+	            
+	         
+			  
+			  
+			  
+			  
+			  }catch(Exception e) {
+				throw new DBAppException("Something went wrong with serializing Rtree");  
+			  }
+	  
+	  
+	  
+	  
+	  }
+	  
   
+	  
+	  
+	  
+  }
   
   
   public void refreshBTree(String strTableName, String strColName)throws DBAppException{
@@ -820,7 +945,7 @@ public class DBApp {
 				  }
 				  
 			  }
-			 System.out.println( t1.searchAll(true));
+		
 			 
 			 // *now we are done with creating the tree and need to serialize it intoa file :D	 
 			 
@@ -874,12 +999,130 @@ public class DBApp {
 	  
 	  
   }
-
+  
+  //bassel	
   public void createRTreeIndex(String strTableName, String strColName) throws DBAppException {
 	  
+	  if(canRTreeIndex(strTableName, strColName)) {
+		  
+		  //* load table object 
+		  Table table=this.loadTable(strTableName);
+		  Vector rest=this.deserilizetable(strTableName);
+		  table.setPagesreferences((List<String>) rest.get(0));
+		  table.setNumofcreatedpages((int)rest.get(1));
+		  // *get the type of the column and parse the value into it
+		  int colIndex=-1;
+		 for (int i = 0; i < table.getColoumn_names().size(); i++) {
+			  if(table.getColoumn_names().get(i).equals(strColName)) {
+				  colIndex=i;
+				  break;
+			  }
+		  	}
+		  //* get the type of the column to create the tree with the same type
+		  String colType=table.getDatatype().get(colIndex);
+		  int treeOrder=0;
+		  // java.lang.Integer, java.lang.String,
+		  //java.lang.Double, java.lang.Boolean, java.util.Date and java.awt.Polygon
+		  
+		  
+		  // * this will go to the properties file to get the maximum node size :D
+		  try (InputStream input = new FileInputStream("config/DBApp.properties")) {
+
+				Properties prop = new Properties();
+
+				// load a properties
+
+				prop.load(input);
+
+				// get the property value and print it out
+				
+				treeOrder= Integer.parseInt(prop.getProperty("NodeSize")) ;
+			} catch (IOException ex) {
+				throw new DBAppException("Error with properties file");
+			}
+		  
+		  if(colType.contentEquals("java.awt.Polygon")) {
+			  // *create a BPlus tree with Integer type
+			  RTree<Integer> t1=new RTree<Integer>(treeOrder);
+			  
+			  // *Loop over each page in the table
+			  for(int i=0;i<table.getPagesreferences().size();i++) {
+				
+				  // *create page object for each page
+				  Page page=table.read_page(table.getPagesreferences().get(i));
+				  
+				  // *loop over each record in the page and insert it in the tree with its respective place
+				  Vector<Vector> recordss=page.RecordsGetter();
+				  
+				  for(int j=0;j<recordss.size();j++) {
+					  
+					  // *create vector record 
+					  Vector record=recordss.get(j);
+					  
+					  // *insert the respective column key with its position
+					  Object u=record.get(colIndex);
+					  Integer area= u instanceof Polygon? getPolyArea((Polygon)u):getPolyArea((String)u);
+					  t1.insert(area, new RTRef(i, j));
+					  
+				  }
+				  
+			  }
+			
+			 
+			 // *now we are done with creating the tree and need to serialize it into a file :D	 
+			 
+			 try {
+				  File file=new File("data/"+strTableName+strColName);
+				  
+				  //Saving of object in a file 
+		          FileOutputStream fo = new FileOutputStream(file); 
+		          ObjectOutputStream out = new ObjectOutputStream(fo); 
+		          
+		          // Method for serialization of object 
+		          out.writeObject(t1); 
+		            
+		          out.close(); 
+		          fo.close(); 
+		            
+		         csvIndex(strTableName, strColName);
+				  
+				  
+				  
+				  
+				  }catch(Exception e) {
+					throw new DBAppException("Something went wrong with serializing Rtree");  
+				  }
+		  
+		  
+		  
+		  
+		  }
+		  
 	  
+	  }
+	  	
 	  
   }
+  
+  public Integer getPolyArea(Polygon p) {
+	  int area=0;
+	  Dimension dim1 = p.getBounds().getSize();
+	  int p1area = dim1.width * dim1.height;
+	  
+	  return area;
+  }
+  
+  
+  
+  
+  public Integer getPolyArea(String s) throws DBAppException {
+	int area=0;
+	Polygon p1= makePolygon(s);
+	Dimension dim1 = p1.getBounds().getSize();
+    int p1area = dim1.width * dim1.height;
+	  return area;
+  }
+  
 
   public void insertIntoTable(String tablename, Hashtable<String, Object> htblColNameValue)
       throws DBAppException, IOException {
@@ -890,7 +1133,7 @@ public class DBApp {
     if (this.missorins(table, htblColNameValue) == true) {
       throw (new DBAppException("missing or inconsisitant data"));
     } else {
-      // System.out.println("done");
+      
       Vector record = new Vector();
       for (int i = 0; i < table.getIskey().size(); i++) {
         if (table.getIskey().get(i) == true) {
@@ -921,6 +1164,9 @@ public class DBApp {
       table.inserttotable(record);
       // System.out.print(table.getPagesreferences());
     }
+    
+    
+    
   }
 
   
@@ -1065,6 +1311,8 @@ public class DBApp {
                     // we modify the old record
                     Polygon newP = makePolygon((String) newRecord.get(k));
                     temp.set(k, newP);
+                    
+                    
                     System.out.println("hna");
                   } else
                     temp.set(k, newRecord.get(k));
@@ -1463,7 +1711,7 @@ public class DBApp {
           tablefound = true;
           if (cname.equals(colName)) {
             colfound = true;
-            if (!ctype.equals("java.util.Polygon"))
+            if (!ctype.equals("java.awt.Polygon"))
               wrongIndex = true;
             else {
               if (isIndexed.contentEquals("False")) {
@@ -1674,8 +1922,6 @@ public class DBApp {
 					record=(Vector)page.get(moveleft);
 			}
 			
-			
-			
 			}
 			
 			
@@ -1726,7 +1972,7 @@ public class DBApp {
 			
 			}
 		
-		//check this bassel
+		
 		
 		if(operator.equals("<")) {
 			while(first<=last) {
@@ -1827,17 +2073,113 @@ public class DBApp {
 		return records;
 		
 	}
+  
+  
+  
+  
+    public Vector newBPSelect(String tableName, String colName, String operator, Object value,List<String> pages)throws Exception{
+    	
+    	Vector<Vector<Integer>> y=new Vector<Vector<Integer>>();
+    	Vector results=new Vector();
+		BPTree<T> t;
+		Table table=this.loadTable(tableName);
+		Vector rest=this.deserilizetable(tableName);
+		table.setPagesreferences(pages);
+		table.setNumofcreatedpages((int)rest.get(1));
+		int colIndex=0;
+		try {
+		
+		
+		for (int j = 0; j < table.getColoumn_names().size(); j++) {
+			if(table.getColoumn_names().get(j).equals(colName)) {
+				colIndex=j;
+				break;
+			}
+		}
+		String colType=table.getDatatype().get(colIndex);
+		if(colType.equals("java.awt.Polygon")) {
+			RTree<T> r=getRTree(tableName, colName);
+			switch (operator) {
+			case "=": y=r.searchAll((T) value);
+				break;
+				
+			case "<": y=r.getLessThan((T) value);
+				break;
+				
+			case "<=": y=r.getLessThanOrEqual((T)value);
+				break;
+				
+			case">":  y=r.getMoreThan((T)value);
+				break;
+			
+			case">=": y=r.getMoreThanOrEqual((T)value);
+				break; 
+				
+			case"!=": y=r.getNotEqual((T)value);
+				break;
+			default:
+				throw new DBAppException("Unvalid operator");
+			
+		}
+			}else {
+			BPTree<T> tree=(BPTree<T>) getBPlusTree(tableName, colName);
+		switch (operator) {
+		case "=": y=tree.searchAll((T) value);
+			break;
+			
+		case "<": y=tree.getLessThan((T) value);
+			break;
+			
+		case "<=": y=tree.getLessThanOrEqual((T)value);
+			break;
+			
+		case">":  y=tree.getMoreThan((T)value);
+			break;
+		
+		case">=": y=tree.getMoreThanOrEqual((T)value);
+			break; 
+			
+		case"!=": y=tree.getNotEqual((T)value);
+			break;
+		default:
+			throw new DBAppException("Unvalid operator");
+			
+		}
+		}
+		
+		
+		
+		
+		for(int i=0;i<y.size();i++) {
+			int pageNo=y.get(i).get(0);
+			int place=y.get(i).get(1);
+			Page page=table.read_page(pages.get(pageNo));
+			results.add(page.RecordsGetter().get(place));
+			
+		}
+		return results;
+		}
+		catch(DBAppException e) {
+			throw e;
+		}
+		catch(Exception e) {
+			throw e;
+			//throw new DBAppException("column is indexed but something went wrong with select");
+		}
+    	
+    }
 	
-	
-	 
 	 
 	 
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public  Vector selectHelper(String tableName, String colName, String operator, Object value) throws DBAppException {
+		
+		try {
 		Vector results=new Vector();
 		
 		// *check if the column is indexed
+		boolean isIndex=false;
 		// *use indexedSelect
 		boolean isKey=false;
 		// *the value type is the same as the column type
@@ -1854,8 +2196,9 @@ public class DBApp {
 				break;
 			}
 		}
-
-
+		
+		
+		isIndex=table.getIsindexed().get(colIndex);
 		isKey=table.getIskey().get(colIndex);
 	
 		String colType=table.getDatatype().get(colIndex);
@@ -1866,6 +2209,12 @@ public class DBApp {
 			p=table.read_page(table.getPagesreferences().get(i));
 			v=p.RecordsGetter();// *got the records in one page
 			
+			
+	
+			
+				
+				
+				
 			if(isKey&&!(operator.equals("!="))) {
 				// *if its on the key we should binary search inside each page :`)
 				
@@ -1902,7 +2251,7 @@ public class DBApp {
 				}
 				
 			}
-					
+			
 					
 					
 					
@@ -1916,7 +2265,12 @@ public class DBApp {
 		
 		
 		
+		
 		return results;
+		}
+		catch(Exception e) {
+			throw new DBAppException("Something went wrong with select helper");
+		}
 	}
 	
 	
@@ -1956,7 +2310,7 @@ public class DBApp {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms,
 			String[] strarrOperators)
-			throws DBAppException{
+			throws Exception{
 		// *number of queries
 		int numberOfResults=arrSQLTerms.length;
 		// *check number of operators and number of queries
@@ -1968,11 +2322,37 @@ public class DBApp {
 		// *result which i will return its iterator
 		Vector balabizo=new Vector();
 		
+		// * I need to get to see if its indexed or not
+		boolean isIndex=false;
+		// *load the table
+		
+		// *get the type of the column and parse the value into it
+		int colIndex=-1;
+		
 		for (int i = 0; i < numberOfResults; i++) {
-			// *will go in operate each query and 
-			e.add(selectHelper(arrSQLTerms[i]._strTableName, arrSQLTerms[i]._strColumnName,
-														arrSQLTerms[i]._strOperator, arrSQLTerms[i]._objValue));
+			// * get table info to check if the column is indexed for each query
+			String tableName=arrSQLTerms[i]._strTableName;
+			String colName=arrSQLTerms[i]._strColumnName;
+			Table table=this.loadTable(tableName);
+			Vector rest=this.deserilizetable(tableName);
+			table.setPagesreferences((List<String>) rest.get(0));
+			table.setNumofcreatedpages((int)rest.get(1));
+			for (int j = 0; j < table.getColoumn_names().size(); j++) {
+				if(table.getColoumn_names().get(j).equals(colName)) {
+					colIndex=j;
+					break;
+				}
+			}
+			isIndex=table.getIsindexed().get(colIndex);
+			if(isIndex) {
+				e.add(newBPSelect(tableName, colName, arrSQLTerms[i]._strOperator, arrSQLTerms[i]._objValue,table.getPagesreferences()));
+				
+			}
 			
+			else {
+			// *will go in operate each query and 
+			e.add(selectHelper(arrSQLTerms[i]._strTableName, arrSQLTerms[i]._strColumnName,arrSQLTerms[i]._strOperator, arrSQLTerms[i]._objValue)); 
+			}
 		}
 		
 	
@@ -1990,7 +2370,10 @@ public class DBApp {
 	public static Vector operations(Vector results,String[] strarrOperators) {
 		// *recursive method that does the AND/OR/XOR between each query :D
 		
-		if(results.size()==1) {
+		if(results.size()<=1) {
+			if(results.size()==0)
+				return new Vector();
+			
 			return ((Vector)results.get(0));
 		}else {
 			//first query results
@@ -2019,11 +2402,15 @@ public class DBApp {
 						f.add((Vector)first.get(i));
 					
 				}
+				for(int i=0;i<second.size();i++) {
+					if(first.contains((Vector)second.get(i)))
+							f.add((Vector)second.get(i));
+				}
 				
 			}else if(opp.equals("OR")) {
 			// *will add whatever exists but eliminate duplicate records
 				f=first;
-				for(int i=0;i<first.size();i++){
+				for(int i=0;i<second.size();i++){
 					if(!(f.contains((Vector)second.get(i))))
 						f.add((Vector)second.get(i));
 				}
@@ -2033,7 +2420,7 @@ public class DBApp {
 				//                         1 XOR 0 = 1
 				
 				// *adds what's in first but not in second
-				for(int i=0;i<first.size();i++) {
+				for(int i=0;i<second.size();i++) {
 					if(!(first.contains((Vector)second.get(i))))
 							f.add((Vector)second.get(i));
 				}

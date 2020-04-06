@@ -1,31 +1,31 @@
-package BPTree;
+package RTree;
 
 import java.io.Serializable;
 
-public class BPTreeInnerNode<T extends Comparable<T>> extends BPTreeNode<T>  implements Serializable
+public class RTreeInnerNode<T extends Comparable<T>> extends RTreeNode<T>  implements Serializable
 {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private BPTreeNode<T>[] children;
+	private RTreeNode<T>[] children;
 	/**
 	 * create BPTreeNode given order.
 	 * @param n
 	 */
 	@SuppressWarnings("unchecked")
-	public BPTreeInnerNode(int n) 
+	public RTreeInnerNode(int n) 
 	{
 		super(n);
 		keys = new Comparable[n];
-		children = new BPTreeNode[n+1];
+		children = new RTreeNode[n+1];
 	}
 
 	/**
 	 * get child with specified index
 	 * @return Node which is child at specified index
 	 */
-	public BPTreeNode<T> getChild(int index) 
+	public RTreeNode<T> getChild(int index) 
 	{
 		return children[index];
 	}
@@ -33,7 +33,7 @@ public class BPTreeInnerNode<T extends Comparable<T>> extends BPTreeNode<T>  imp
 	/**
 	 * creating child at specified index
 	 */
-	public void setChild(int index, BPTreeNode<T> child) 
+	public void setChild(int index, RTreeNode<T> child) 
 	{
 		children[index] = child;
 	}
@@ -41,7 +41,7 @@ public class BPTreeInnerNode<T extends Comparable<T>> extends BPTreeNode<T>  imp
 	 * get the first child of this node.
 	 * @return first child node.
 	 */
-	public BPTreeNode<T> getFirstChild()
+	public RTreeNode<T> getFirstChild()
 	{
 		return children[0];
 	}
@@ -49,7 +49,7 @@ public class BPTreeInnerNode<T extends Comparable<T>> extends BPTreeNode<T>  imp
 	 * get the last child of this node
 	 * @return last child node.
 	 */
-	public BPTreeNode<T> getLastChild()
+	public RTreeNode<T> getLastChild()
 	{
 		return children[numberOfKeys];
 	}
@@ -65,12 +65,12 @@ public class BPTreeInnerNode<T extends Comparable<T>> extends BPTreeNode<T>  imp
 	/**
 	 * insert given key in the corresponding index.
 	 * @param key key to be inserted
-	 * @param Ref reference which that inserted key is located
+	 * @param RTRef reference which that inserted key is located
 	 * @param parent parent of that inserted node
 	 * @param ptr index of pointer in the parent node pointing to the current node
 	 * @return value to be pushed up to the parent.
 	 */
-	public PushUp<T> insert(T key, Ref recordReference, BPTreeInnerNode<T> parent, int ptr)
+	public PushUp<T> insert(T key, RTRef recordReference, RTreeInnerNode<T> parent, int ptr)
 	{
 		int index = findIndex(key);
 		PushUp<T> pushUp = children[index].insert(key, recordReference, this, index);
@@ -80,7 +80,7 @@ public class BPTreeInnerNode<T extends Comparable<T>> extends BPTreeNode<T>  imp
 		
 		if(this.isFull())
 		{
-			BPTreeInnerNode<T> newNode = this.split(pushUp);
+			RTreeInnerNode<T> newNode = this.split(pushUp);
 			Comparable<T> newKey = newNode.getFirstKey();
 			newNode.deleteAt(0, 0);
 			return new PushUp<T>(newNode, newKey);
@@ -100,7 +100,7 @@ public class BPTreeInnerNode<T extends Comparable<T>> extends BPTreeNode<T>  imp
 	 * @return Inner node after splitting
 	 */
 	@SuppressWarnings("unchecked")
-	public BPTreeInnerNode<T> split(PushUp<T> pushup) 
+	public RTreeInnerNode<T> split(PushUp<T> pushup) 
 	{
 		int keyIndex = this.findIndex((T)pushup.key);
 		int midIndex = numberOfKeys / 2 - 1;
@@ -109,7 +109,7 @@ public class BPTreeInnerNode<T extends Comparable<T>> extends BPTreeNode<T>  imp
 
 		int totalKeys = numberOfKeys + 1;
 		//move keys to a new node
-		BPTreeInnerNode<T> newNode = new BPTreeInnerNode<T>(order);
+		RTreeInnerNode<T> newNode = new RTreeInnerNode<T>(order);
 		for (int i = midIndex; i < totalKeys - 1; ++i) 
 		{	
 			newNode.insertRightAt(i - midIndex, this.getKey(i), this.getChild(i+1));
@@ -162,7 +162,7 @@ public class BPTreeInnerNode<T extends Comparable<T>> extends BPTreeNode<T>  imp
 	 * @param key to be inserted in that index
 	 * @param leftChild child which this node points to with pointer at left of that index
 	 */
-	public void insertLeftAt(int index, Comparable<T> key, BPTreeNode<T> leftChild) 
+	public void insertLeftAt(int index, Comparable<T> key, RTreeNode<T> leftChild) 
 	{
 		insertAt(index, key);
 		this.setChild(index+1, this.getChild(index));
@@ -173,7 +173,7 @@ public class BPTreeInnerNode<T extends Comparable<T>> extends BPTreeNode<T>  imp
 	 * @param key to be inserted in that index
 	 * @param rightChild child which this node points to with pointer at right of that index
 	 */
-	public void insertRightAt(int index, Comparable<T> key, BPTreeNode<T> rightChild)
+	public void insertRightAt(int index, Comparable<T> key, RTreeNode<T> rightChild)
 	{
 		insertAt(index, key);
 		this.setChild(index + 1, rightChild);
@@ -181,7 +181,7 @@ public class BPTreeInnerNode<T extends Comparable<T>> extends BPTreeNode<T>  imp
 	/**
 	 * delete key and return true or false if it is deleted or not
 	 */
-	public boolean delete(T key, BPTreeInnerNode<T> parent, int ptr) 
+	public boolean delete(T key, RTreeInnerNode<T> parent, int ptr) 
 	{
 		boolean done = false;
 		for(int i = 0; !done && i < numberOfKeys; ++i)
@@ -212,12 +212,12 @@ public class BPTreeInnerNode<T extends Comparable<T>> extends BPTreeNode<T>  imp
 	 * @param ptr index of pointer in the parent node pointing to the current node 
 	 * @return true or false if it can borrow form right sibling or left sibling or it can not
 	 */
-	public boolean borrow(BPTreeInnerNode<T> parent, int ptr)
+	public boolean borrow(RTreeInnerNode<T> parent, int ptr)
 	{
 		//check left sibling
 		if(ptr > 0)
 		{
-			BPTreeInnerNode<T> leftSibling = (BPTreeInnerNode<T>) parent.getChild(ptr-1);
+			RTreeInnerNode<T> leftSibling = (RTreeInnerNode<T>) parent.getChild(ptr-1);
 			if(leftSibling.numberOfKeys > leftSibling.minKeys())
 			{
 				this.insertLeftAt(0, parent.getKey(ptr-1), leftSibling.getLastChild());
@@ -231,7 +231,7 @@ public class BPTreeInnerNode<T extends Comparable<T>> extends BPTreeNode<T>  imp
 		//check right sibling
 		if(ptr < parent.numberOfKeys)
 		{
-			BPTreeInnerNode<T> rightSibling = (BPTreeInnerNode<T>) parent.getChild(ptr+1);
+			RTreeInnerNode<T> rightSibling = (RTreeInnerNode<T>) parent.getChild(ptr+1);
 			if(rightSibling.numberOfKeys > rightSibling.minKeys())
 			{
 				this.insertRightAt(this.numberOfKeys, parent.getKey(ptr), rightSibling.getFirstChild());
@@ -248,19 +248,19 @@ public class BPTreeInnerNode<T extends Comparable<T>> extends BPTreeNode<T>  imp
 	 * @param parent of the current node 
 	 * @param ptr index of pointer in the parent node pointing to the current node
 	 */
-	public void merge(BPTreeInnerNode<T> parent, int ptr)
+	public void merge(RTreeInnerNode<T> parent, int ptr)
 	{
 		if(ptr > 0)
 		{
 			//merge with left
-			BPTreeInnerNode<T> leftSibling = (BPTreeInnerNode<T>) parent.getChild(ptr-1);
+			RTreeInnerNode<T> leftSibling = (RTreeInnerNode<T>) parent.getChild(ptr-1);
 			leftSibling.merge(parent.getKey(ptr-1), this);
 			parent.deleteAt(ptr-1);			
 		}
 		else
 		{
 			//merge with right
-			BPTreeInnerNode<T> rightSibling = (BPTreeInnerNode<T>) parent.getChild(ptr+1);
+			RTreeInnerNode<T> rightSibling = (RTreeInnerNode<T>) parent.getChild(ptr+1);
 			this.merge(parent.getKey(ptr), rightSibling);
 			parent.deleteAt(ptr);
 		}
@@ -272,7 +272,7 @@ public class BPTreeInnerNode<T extends Comparable<T>> extends BPTreeNode<T>  imp
 	 * @param parentKey the pulled key from the parent to be inserted in the merged node
 	 * @param foreignNode the node to be merged with the current node
 	 */
-	public void merge(Comparable<T> parentKey, BPTreeInnerNode<T> foreignNode)
+	public void merge(Comparable<T> parentKey, RTreeInnerNode<T> foreignNode)
 	{
 		this.insertRightAt(numberOfKeys, parentKey, foreignNode.getFirstChild());
 		for(int i = 0; i < foreignNode.numberOfKeys; ++i)
@@ -300,7 +300,7 @@ public class BPTreeInnerNode<T extends Comparable<T>> extends BPTreeNode<T>  imp
 	 * searches for the record reference of the specified key
 	 */
 	@Override
-	public Ref search(T key) 
+	public RTRef search(T key) 
 	{
 		return children[findIndex(key)].search(key);
 	}
