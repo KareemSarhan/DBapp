@@ -413,7 +413,7 @@ public class DBApp <T extends Comparable<T>> {
 		 
 		 try {
 			  File file=new File("data/"+strTableName+strColName);
-			  System.out.println("hi");
+			  
 			  //Saving of object in a file 
 	          FileOutputStream fo = new FileOutputStream(file); 
 	          ObjectOutputStream out = new ObjectOutputStream(fo); 
@@ -945,7 +945,7 @@ public class DBApp <T extends Comparable<T>> {
 				  }
 				  
 			  }
-			 System.out.println( t1.searchAll(true));
+		
 			 
 			 // *now we are done with creating the tree and need to serialize it intoa file :D	 
 			 
@@ -1061,8 +1061,8 @@ public class DBApp <T extends Comparable<T>> {
 					  
 					  // *insert the respective column key with its position
 					  Object u=record.get(colIndex);
-					  Integer h= u instanceof Polygon? getPolyArea((Polygon)u):getPolyArea((String)u);
-					  t1.insert(h, new RTRef(i, j));
+					  Integer area= u instanceof Polygon? getPolyArea((Polygon)u):getPolyArea((String)u);
+					  t1.insert(area, new RTRef(i, j));
 					  
 				  }
 				  
@@ -1073,7 +1073,7 @@ public class DBApp <T extends Comparable<T>> {
 			 
 			 try {
 				  File file=new File("data/"+strTableName+strColName);
-				  System.out.println("hi");
+				  
 				  //Saving of object in a file 
 		          FileOutputStream fo = new FileOutputStream(file); 
 		          ObjectOutputStream out = new ObjectOutputStream(fo); 
@@ -1311,6 +1311,8 @@ public class DBApp <T extends Comparable<T>> {
                     // we modify the old record
                     Polygon newP = makePolygon((String) newRecord.get(k));
                     temp.set(k, newP);
+                    
+                    
                     System.out.println("hna");
                   } else
                     temp.set(k, newRecord.get(k));
@@ -2075,7 +2077,7 @@ public class DBApp <T extends Comparable<T>> {
   
   
   
-    public Vector newBPSelect(String tableName, String colName, String operator, Object value,List<String> pages)throws DBAppException{
+    public Vector newBPSelect(String tableName, String colName, String operator, Object value,List<String> pages)throws Exception{
     	
     	Vector<Vector<Integer>> y=new Vector<Vector<Integer>>();
     	Vector results=new Vector();
@@ -2156,8 +2158,13 @@ public class DBApp <T extends Comparable<T>> {
 			
 		}
 		return results;
-		}catch(Exception e) {
-			throw new DBAppException("column is indexed but something went wrong with select");
+		}
+		catch(DBAppException e) {
+			throw e;
+		}
+		catch(Exception e) {
+			throw e;
+			//throw new DBAppException("column is indexed but something went wrong with select");
 		}
     	
     }
@@ -2303,7 +2310,7 @@ public class DBApp <T extends Comparable<T>> {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms,
 			String[] strarrOperators)
-			throws DBAppException{
+			throws Exception{
 		// *number of queries
 		int numberOfResults=arrSQLTerms.length;
 		// *check number of operators and number of queries
@@ -2394,6 +2401,10 @@ public class DBApp <T extends Comparable<T>> {
 					if(second.contains((Vector)first.get(i)))
 						f.add((Vector)first.get(i));
 					
+				}
+				for(int i=0;i<second.size();i++) {
+					if(first.contains((Vector)second.get(i)))
+							f.add((Vector)second.get(i));
 				}
 				
 			}else if(opp.equals("OR")) {

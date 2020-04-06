@@ -94,15 +94,15 @@ public class DBAppTest {
 		i++;
 		}
 		arrSQLTerms[0]._strTableName = "gay";
-		arrSQLTerms[0]._strColumnName= "id";
-		arrSQLTerms[0]._strOperator = ">=";//=,<=,>=,>,<
-		arrSQLTerms[0]._objValue = new Integer(5);
+		arrSQLTerms[0]._strColumnName= "area";
+		arrSQLTerms[0]._strOperator = "!=";//=,<=,>=,>,<
+		arrSQLTerms[0]._objValue = new Integer(1);
 		arrSQLTerms[1]._strTableName = "gay";
 		arrSQLTerms[1]._strColumnName= "id";
 		arrSQLTerms[1]._strOperator = "<";
-		arrSQLTerms[1]._objValue = new Integer(10);
+		arrSQLTerms[1]._objValue = new Integer(2);
 		String[]strarrOperators = new String[1];
-		strarrOperators[0] = "XOR";
+		strarrOperators[0] = "OR";
 		// lazem te check tab3an hal el column da indexed wala la2
 		//then check law howa polygon 3ashan law ah hate3mel Rtree be nafs kol 7aga
 		
@@ -111,14 +111,14 @@ public class DBAppTest {
 		//ba3d keda ha search el tree 
 		//lazem te type cast ma3lesh we lazem Integer mesh int we new Double we keda matensash te type
 		Object v=new Integer(17);
-		System.out.println(tree.wezwez((T)v)[0]+" "+tree.wezwez((T)v)[1]);
+		
 		//[0] Di el page fel page refrence we [1] di el index
 		
 		Iterator result=dbApp.selectFromTable(arrSQLTerms , strarrOperators);
 		
-		//while(result.hasNext()) {
-		//	System.out.println(result.next());
-	//	}
+		while(result.hasNext()) {
+			System.out.println(result.next());
+		}
 		
 		
 
@@ -157,7 +157,7 @@ public class DBAppTest {
 		
 		//dbApp.createRTreeIndex(strTableName, "area");
 		RTree<T> r=dbApp.getRTree(strTableName, "area");
-		System.out.println(r);
+
 		Hashtable htblColNameValue = new Hashtable( );
 		htblColNameValue.put("id", new Integer( i ));
 		htblColNameValue.put("name", new String("miro" ) );
@@ -165,7 +165,7 @@ public class DBAppTest {
 		dbApp.insertIntoTable( strTableName , htblColNameValue );
 		dbApp.refreshRTree(strTableName, "area");
 		r=dbApp.getRTree(strTableName, "area");
-		System.out.println(r);
+		
 		
 	}
 

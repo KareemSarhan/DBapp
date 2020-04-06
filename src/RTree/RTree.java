@@ -156,12 +156,12 @@ public class RTree<T extends Comparable<T>> implements Serializable{
 		RTreeLeafNode<T> leaf=(RTreeLeafNode)curNode;
 		
 		
-		while(leaf.getNext()!=null) {
+		while(leaf!=null) {
 			Comparable<T>[] keys=leaf.keys;
 			
 			for(int i=0;i<keys.length;i++) {
 				
-				if(keys[i].compareTo(value)<0) {
+				if(keys[i]!=null&&keys[i].compareTo(value)<0) {
 					Vector<Vector<Integer>> copy=tito.searchAll((T) keys[i]);
 					
 					for(int k=0;k<copy.size();k++) {
@@ -171,7 +171,9 @@ public class RTree<T extends Comparable<T>> implements Serializable{
 				}
 				
 			}
+			
 			leaf=leaf.getNext();
+			
 		}
 		
 		
@@ -197,22 +199,27 @@ public class RTree<T extends Comparable<T>> implements Serializable{
 		RTreeLeafNode<T> leaf=(RTreeLeafNode)curNode;
 		
 		
-		while(leaf.getNext()!=null) {
+		while(leaf!=null) {
 			Comparable<T>[] keys=leaf.keys;
 			
 			for(int i=0;i<keys.length;i++) {
-				
-				if(keys[i].compareTo(value)<=0) {
+			
+				if(keys[i]!=null&&keys[i].compareTo(value)<=0) {
 					Vector<Vector<Integer>> copy=tito.searchAll((T) keys[i]);
 					
 					for(int k=0;k<copy.size();k++) {
+						
 						indexes.add(copy.get(k));
 					}
 						
 				}
 				
 			}
+			RTreeLeafNode<T>currr=leaf;
 			leaf=leaf.getNext();
+			if(leaf.index==currr.index)
+				break;
+			
 		}
 		
 		
@@ -240,12 +247,12 @@ public class RTree<T extends Comparable<T>> implements Serializable{
 		RTreeLeafNode<T> leaf=(RTreeLeafNode)curNode;
 		
 		
-		while(leaf.getNext()!=null) {
+		while(leaf!=null) {
 			Comparable<T>[] keys=leaf.keys;
 			
 			for(int i=0;i<keys.length;i++) {
 				
-				if(keys[i].compareTo(value)>0) {
+				if(keys[i]!=null&&keys[i].compareTo(value)>0) {
 					Vector<Vector<Integer>> copy=tito.searchAll((T) keys[i]);
 					
 					for(int k=0;k<copy.size();k++) {
@@ -255,7 +262,9 @@ public class RTree<T extends Comparable<T>> implements Serializable{
 				}
 				
 			}
+			RTreeLeafNode<T>currr=leaf;
 			leaf=leaf.getNext();
+			
 		}
 		
 		
@@ -281,12 +290,12 @@ public class RTree<T extends Comparable<T>> implements Serializable{
 		RTreeLeafNode<T> leaf=(RTreeLeafNode)curNode;
 		
 		
-		while(leaf.getNext()!=null) {
+		while(leaf!=null) {
 			Comparable<T>[] keys=leaf.keys;
 			
 			for(int i=0;i<keys.length;i++) {
 				//System.out.print(keys[i]+" ");
-				if(keys[i].compareTo(value)>=0) {
+				if(keys[i]!=null&&keys[i].compareTo(value)>=0) {
 					Vector<Vector<Integer>> copy=tito.searchAll((T) keys[i]);
 					
 					for(int k=0;k<copy.size();k++) {
@@ -296,7 +305,11 @@ public class RTree<T extends Comparable<T>> implements Serializable{
 				}
 				
 			}
+			RTreeLeafNode<T>currr=leaf;
 			leaf=leaf.getNext();
+			if(leaf!=null)
+			if(leaf.index==currr.index)
+				break;
 		}
 		
 		
@@ -323,12 +336,12 @@ public class RTree<T extends Comparable<T>> implements Serializable{
 		RTreeLeafNode<T> leaf=(RTreeLeafNode)curNode;
 		
 		
-		while(leaf.getNext()!=null) {
+		while(leaf!=null) {
 			Comparable<T>[] keys=leaf.keys;
 			
 			for(int i=0;i<keys.length;i++) {
 				
-				if(keys[i].compareTo(value)!=0) {
+				if(keys[i]!=null&&keys[i].compareTo(value)!=0) {
 					Vector<Vector<Integer>> copy=tito.searchAll((T) keys[i]);
 					
 					for(int k=0;k<copy.size();k++) {
@@ -338,7 +351,15 @@ public class RTree<T extends Comparable<T>> implements Serializable{
 				}
 				
 			}
+			if(leaf.getNext()==null)
+				break;
+			if(leaf==null)
+				break;
+			if(leaf.index==leaf.getNext().index)
+				break;
+			
 			leaf=leaf.getNext();
+			
 		}
 		
 		
@@ -366,7 +387,7 @@ public class RTree<T extends Comparable<T>> implements Serializable{
 		RTreeLeafNode<T> leaf=(RTreeLeafNode)curNode;
 		
 		
-		while(leaf.getNext()!=null) {
+		while(leaf!=null) {
 			Comparable<T>[] keys=leaf.keys;
 			
 			for(int i=0;i<keys.length;i++) {
