@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "CodeLens (Launch) - Page",
+            "request": "launch",
+            "mainClass": "ANAMESH3AYEEZ2ALA2HENA.Page",
+            "projectName": "ANAMESH3AYEEZ2ALA2HENA"
+        },
+        {
+            "type": "java",
             "name": "CodeLens (Launch) - DBAppTest",
             "request": "launch",
             "mainClass": "ANAMESH3AYEEZ2ALA2HENA.DBAppTest",

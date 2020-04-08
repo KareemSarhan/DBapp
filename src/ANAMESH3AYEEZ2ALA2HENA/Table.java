@@ -151,11 +151,12 @@ public class Table implements Serializable {
 	}
 
 	public Vector removefromtable(Vector record) throws IOException, DBAppException {
+		this.getIsindexed();
 		this.update();
 		Vector out = new Vector<String>();
 		for (int i = 0; i < this.pagesreferences.size(); i++) {
 			Page page = this.read_page(this.pagesreferences.get(i));
-			System.err.println(page.delete(record));
+			System.err.println(page.delete(record, this.getIsindexed(), i, this));
 
 			if (page.RecordsGetter().isEmpty()) {
 				out.add(page.getPath());
