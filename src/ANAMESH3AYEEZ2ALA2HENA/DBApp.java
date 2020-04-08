@@ -1309,29 +1309,34 @@ public class DBApp<T extends Comparable<T>> {
 		// System.out.println("done");
 		Vector record = new Vector();
 		for (int i = 0; i < table.getIskey().size(); i++) {
-			if (table.getIskey().get(i) == true) {
-				if (table.getDatatype().get(i).equals("java.awt.Polygon")) {
-					PolygonE temp = this.makePolygon((String) htblColNameValue.get(table.getColoumn_names().get(i)));
-					record.add(temp);
-				} else {
-					record.add(htblColNameValue.get(table.getColoumn_names().get(i)));
-					// System.out.println(record);
+			if (htblColNameValue.get(table.getColoumn_names().get(i)) != null) {
+				if (table.getIskey().get(i) == true) {
+					if (table.getDatatype().get(i).equals("java.awt.Polygon")) {
+						PolygonE temp = this
+								.makePolygon((String) htblColNameValue.get(table.getColoumn_names().get(i)));
+						record.add(temp);
+					} else {
+						record.add(htblColNameValue.get(table.getColoumn_names().get(i)));
+						// System.out.println(record);
+					}
+					break;
 				}
-				break;
 			}
 		}
 		for (int i = 0; i < table.getIskey().size() - 1; i++) {
-			if (table.getIskey().get(i) == false) {
-				if (table.getDatatype().get(i).equals("java.awt.Polygon")) {
-					PolygonE temp = this.makePolygon((String) htblColNameValue.get(table.getColoumn_names().get(i)));
-					record.add(temp);
-				} else {
-					record.add(htblColNameValue.get(table.getColoumn_names().get(i)));
+			if (htblColNameValue.get(table.getColoumn_names().get(i)) != null) {
+				if (table.getIskey().get(i) == false) {
+					if (table.getDatatype().get(i).equals("java.awt.Polygon")) {
+						PolygonE temp = this
+								.makePolygon((String) htblColNameValue.get(table.getColoumn_names().get(i)));
+						record.add(temp);
+					} else {
+						record.add(htblColNameValue.get(table.getColoumn_names().get(i)));
+					}
 				}
 			}
-
 		}
-		for (int i = 0; i < table.getIskey().size() - 1; i++) {
+		for (int i = 0; i < record.size(); i++) {
 			if (table.getIsindexed().get(i) && record.get(i) != null) {
 				foundindexed = true;
 				pos2.clear();
@@ -1342,7 +1347,6 @@ public class DBApp<T extends Comparable<T>> {
 					search.clear();
 					search.addAll(btree.searchAll((T) record.get(i)));
 					if (search.size() > pos2.size()) {
-
 						bigger.clear();
 						bigger.addAll(search);
 						smaller.clear();
@@ -1399,6 +1403,15 @@ public class DBApp<T extends Comparable<T>> {
 		} else if (!foundindexed) {
 			table.removefromtable(record);
 
+		}
+		for (int i = 0; i < table.getColoumn_names().size(); i++) {
+			if (table.getIsindexed().get(i) == true) {
+				if (table.getDatatype().get(i) == "java.awt.Polygon") {
+					refreshRTree(table.getName(), table.getColoumn_names().get(i));
+
+				} else
+					refreshBTree(table.getName(), table.getColoumn_names().get(i));
+			}
 		}
 	}
 	// public void deleteFromTable(String tablename, Hashtable<String, Object>

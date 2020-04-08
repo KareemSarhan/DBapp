@@ -17,22 +17,25 @@ public class DBAppTest {
 		dbApp.init();
 		// createtablemain(dbApp, strTableName);
 		// deletemain();
-		// // dbApp.displayer("delete");
-		// dbApp.createRTreeIndex(strTableName, "area");
+		// // // dbApp.displayer("delete");
+		// // dbApp.createRTreeIndex(strTableName, "area");
 		Hashtable htblColNameValue;
-		htblColNameValue = new Hashtable();
-		// htblColNameValue.put("id", new Integer(5));
-		// htblColNameValue.put("name", new String("miro" + 3));
-		htblColNameValue.put("area", new String("(0,0),(0,0),(0,0),(0,0)"));
-		// dbApp.insertIntoTable(strTableName, htblColNameValue);
 		// htblColNameValue = new Hashtable();
-		// dbApp.createBTreeIndex(strTableName, "id");
-		// htblColNameValue.put("id", 5);
-		// htblColNameValue.put("name", new String("miro" + 5));
+		// // htblColNameValue.put("id", new Integer(5));
+		// // htblColNameValue.put("name", new String("miro" + 3));
+		// htblColNameValue.put("area", new String("(0,0),(0,0),(0,0),(0,0)"));
+		// // dbApp.insertIntoTable(strTableName, htblColNameValue);
+		htblColNameValue = new Hashtable();
+		// dbApp.createBTreeIndex(strTableName, "area");
+		htblColNameValue.put("id", 13);
+		htblColNameValue.put("name", new String("miro" + 13));
 		// htblColNameValue.put("area", new String("(0,0),(0,0),(0,0),(0,0)"));
 		dbApp.deleteFromTable(strTableName, htblColNameValue);
+		// dbApp.createBTreeIndex(strTableName, "area");
+		// dbApp.createBTreeIndex(strTableName, "name");
 		dbApp.refreshBTree(strTableName, "id");
-		// dbApp.refreshBTree(strTableName, "area");
+		dbApp.refreshBTree(strTableName, "name");
+		dbApp.refreshBTree(strTableName, "area");
 		dbApp.displayer("delete");
 	}
 
@@ -42,10 +45,10 @@ public class DBAppTest {
 		DBApp dbApp = new DBApp();
 		dbApp.init();
 		Hashtable htblColNameValue;
-		for (int i = 0; i < 2000; i++) {
+		for (int i = 0; i < 400; i++) {
 			htblColNameValue = new Hashtable();
-			htblColNameValue.put("id", new Integer(i));
-			htblColNameValue.put("name", new String("miro" + i));
+			htblColNameValue.put("id", new Integer(i % 25));
+			htblColNameValue.put("name", new String("miro" + i % 35));
 			htblColNameValue.put("area", new String("(0,0),(0,0),(0,0),(0,0)"));
 			dbApp.insertIntoTable(strTableName, htblColNameValue);
 		}
