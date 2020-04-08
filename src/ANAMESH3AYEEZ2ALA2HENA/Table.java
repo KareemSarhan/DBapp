@@ -150,7 +150,7 @@ public class Table implements Serializable {
 		return null;
 	}
 
-	public Vector removefromtable(Vector record) throws IOException, DBAppException {
+	public Vector removefromtable(Vector record) throws Exception {
 		this.getIsindexed();
 		this.update();
 		Vector out = new Vector<String>();

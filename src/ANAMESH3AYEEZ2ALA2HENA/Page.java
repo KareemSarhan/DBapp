@@ -155,8 +155,7 @@ public class Page implements Serializable {
 		}
 	}
 
-	public boolean delete(Vector record, List<Boolean> indexed, int pagenum, Table table)
-			throws IOException, DBAppException {
+	public boolean delete(Vector record, List<Boolean> indexed, int pagenum, Table table) throws Exception {
 		// System.err.println(this.records.indexOf(record));
 		boolean removed = false;
 		for (int i = 0; i < this.records.size(); i++) {
@@ -193,39 +192,40 @@ public class Page implements Serializable {
 	}
 
 	private static <T extends Comparable<T>> boolean SubCompare(Vector record, Vector Deleterecord,
-			List<Boolean> indexed, int pagenum, int recnum, Table table) throws DBAppException {
+			List<Boolean> indexed, int pagenum, int recnum, Table table) throws Exception {
 		Vector<Vector<Integer>> tempVtree;
 		BPTree<T> BPtree;
 		RTree<T> Rtree;
+		boolean returned = false;
 
 		Vector<Integer> tempVector = new Vector<Integer>();
-		for (int i = 0; i < Deleterecord.size(); i++) {
+		for (int i = 0; i < Deleterecord.size() - 1; i++) {
 			if (Deleterecord.get(i) != null && indexed.get(i) == false) {
 				if (record.get(i) instanceof PolygonE && Deleterecord.get(i) instanceof PolygonE) {
 					if (!((PolygonE) record.get(i)).equals(((PolygonE) Deleterecord.get(i))))
-						return false;
+						return returned;
 				} else {
 					if (!record.get(i).equals(Deleterecord.get(i))) {
-						return false;
+						return returned;
 					}
 
 				}
 			} else if (Deleterecord.get(i) != null && indexed.get(i) == true) {
 				if (Deleterecord.get(i) instanceof PolygonE) {
-					Rtree = (RTree<T>) DBApp.getBPlusTree(table.getName(), table.getColoumn_names().get(i));
-					tempVtree = Rtree.searchAll((T) Deleterecord.get(i));
+					Rtree = (RTree<T>) DBApp.StaticgetTree(table.getName(), table.getColoumn_names().get(i));
+					tempVtree = Rtree.searchAll(Deleterecord.get(i));
 					tempVector.add(pagenum);
 					tempVector.add(recnum);
 					if (tempVtree.indexOf(tempVector) == -1) {
-						return false;
+						return returned;
 					}
 				} else {
-					BPtree = (BPTree<T>) DBApp.getBPlusTree(table.getName(), table.getColoumn_names().get(i));
+					BPtree = (BPTree<T>) DBApp.StaticgetTree(table.getName(), table.getColoumn_names().get(i));
 					tempVtree = BPtree.searchAll((T) Deleterecord.get(i));
 					tempVector.add(pagenum);
 					tempVector.add(recnum);
 					if (tempVtree.indexOf(tempVector) == -1) {
-						return false;
+						return returned;
 					}
 
 					// if (!record.get(i).equals(Deleterecord.get(i))) {
@@ -235,7 +235,8 @@ public class Page implements Serializable {
 
 			}
 		}
-		return true;
+		returned = true;
+		return returned;
 
 	}
 

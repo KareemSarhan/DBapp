@@ -301,7 +301,29 @@ public class DBApp<T extends Comparable<T>> {
 
 	}
 
-	public static Object getBPlusTree(String strTableName, String strColName) throws DBAppException {
+	public static Object StaticgetTree(String strTableName, String strColName) throws Exception {
+		Object o = 3;
+		try {
+			// Reading the object from a file
+			FileInputStream file = new FileInputStream("data/" + strTableName + strColName);
+			ObjectInputStream in = new ObjectInputStream(file);
+
+			// Method for deserialization of object
+			o = (Object) in.readObject();
+
+			in.close();
+			file.close();
+
+		}
+
+		catch (Exception ex) {
+
+		}
+
+		return o;
+	}
+
+	public Object getBPlusTree(String strTableName, String strColName) throws DBAppException {
 		Object o = 3;
 		try {
 			// Reading the object from a file
@@ -1070,7 +1092,7 @@ public class DBApp<T extends Comparable<T>> {
 	}
 
 	public void updateTable(String strTableName, String strKey, Hashtable<String, Object> htblColNameValue)
-			throws DBAppException, IOException {
+			throws Exception {
 		/*
 		 * bos yasta enta lama betgigi te update betecheck 3ala column tab3an we betgib
 		 * el values
@@ -1260,8 +1282,7 @@ public class DBApp<T extends Comparable<T>> {
 
 	}
 
-	public void deleteFromTable(String tablename, Hashtable<String, Object> htblColNameValue)
-			throws DBAppException, IOException {
+	public void deleteFromTable(String tablename, Hashtable<String, Object> htblColNameValue) throws Exception {
 
 		/*
 		 * bos yasta enta lama betgigi te delete betecheck 3ala kaza column tab3an we
@@ -1324,14 +1345,14 @@ public class DBApp<T extends Comparable<T>> {
 		table.setPagesreferences((List<String>) rest.get(0));
 		table.setNumofcreatedpages((int) rest.get(1));
 
-		if (this.missorins(table, htblColNameValue) == true) {
+		if (/* this.missorins(table, htblColNameValue) == true */ false) {
 			throw (new DBAppException("missing or inconsisitant data"));
 		} else {
 			// System.out.println("done");
 			Vector record = new Vector();
 			for (int i = 0; i < table.getIskey().size(); i++) {
 				if (table.getIskey().get(i) == true) {
-					if (((String) table.getDatatype().get(i)).equals("java.awt.Polygon")) {
+					if (table.getDatatype().get(i).equals("java.awt.Polygon")) {
 						PolygonE temp = this
 								.makePolygon((String) htblColNameValue.get(table.getColoumn_names().get(i)));
 						record.add(temp);
@@ -1344,8 +1365,8 @@ public class DBApp<T extends Comparable<T>> {
 			}
 			for (int i = 0; i < table.getIskey().size() - 1; i++) {
 				if (table.getIskey().get(i) == false) {
-					if (table.getDatatype().get(i) == "java.awt.Polygon") {
-						PolygonE temp = DBApp
+					if (table.getDatatype().get(i).equals("java.awt.Polygon")) {
+						PolygonE temp = this
 								.makePolygon((String) htblColNameValue.get(table.getColoumn_names().get(i)));
 						record.add(temp);
 					} else {
@@ -1355,7 +1376,6 @@ public class DBApp<T extends Comparable<T>> {
 			}
 			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 			Date date = new Date();
-
 			record.add(formatter.format(date) + "");
 			Vector out = table.removefromtable(record);
 			for (int i = 0; i < table.getColoumn_names().size(); i++) {
@@ -1369,7 +1389,6 @@ public class DBApp<T extends Comparable<T>> {
 			}
 			for (int i = 0; i < out.size(); i++) {
 				File F = new File(out.get(i) + "");
-
 			}
 
 		}
