@@ -5,6 +5,9 @@ import java.awt.Polygon;
 import java.io.*;
 import java.util.*;
 
+import BPTree.BPTree;
+import RTree.RTree;
+
 @SuppressWarnings("all")
 
 public class Page implements Serializable {
@@ -36,8 +39,7 @@ public class Page implements Serializable {
 			prop.load(input);
 
 			// get the property value and print it out
-			this.maxnumrecords = Integer.parseInt(prop.getProperty("MaximumRowsCountinPage")) ;
-			 
+			this.maxnumrecords = Integer.parseInt(prop.getProperty("MaximumRowsCountinPage"));
 
 		} catch (IOException ex) {
 			throw new DBAppException("Error with properties file");
@@ -153,13 +155,40 @@ public class Page implements Serializable {
 		}
 	}
 
-	public boolean delete(Vector record) throws IOException, DBAppException {
+	public void deleteind(Vector<Object> dellrecord, Integer integer) throws IOException, DBAppException {
+
+		if (SubCompare2(dellrecord, integer)) {
+			this.records.remove((Vector) this.RecordsGetter().get(integer));
+		}
+		this.update();
+
+	}
+
+	private boolean SubCompare2(Vector<Object> dellrecord, Integer integer) {
+		for (int i = 0; i < dellrecord.size(); i++) {
+
+			if (dellrecord != null) {
+				System.out.println("al records getter" + this.RecordsGetter().get(integer));
+
+				if (((Vector) this.RecordsGetter().get(integer)).get(i) instanceof PolygonE
+						&& dellrecord.get(i) instanceof PolygonE) {
+					if ((((Vector) this.RecordsGetter().get(integer)).get(i)).equals((PolygonE) dellrecord.get(i)))
+						return false;
+				} else {
+					if (!(((Vector) this.RecordsGetter().get(integer)).get(i)).equals(dellrecord.get(i))) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+	}
+
+	public boolean delete(Vector record, List<Boolean> indexed, int pagenum, Table table) throws Exception {
 		// System.err.println(this.records.indexOf(record));
 		boolean removed = false;
 		for (int i = 0; i < this.records.size(); i++) {
-			// if ()
-			// System.err.println(SubCompare((Vector) this.records.get(i), record));
-			if (SubCompare((Vector) this.records.get(i), record)) {
+			if (SubCompare((Vector) this.records.get(i), record, indexed, pagenum, i, table)) {
 				System.err.println();
 				removed = this.records.remove((Vector) this.records.get(i));
 
@@ -174,20 +203,73 @@ public class Page implements Serializable {
 		return removed;
 	}
 
-	private boolean SubCompare(Vector record, Vector Deleterecord) {
-		for (int i = 0; i < record.size(); i++) {
-			if (record.get(i) instanceof PolygonE && Deleterecord.get(i) instanceof PolygonE) {
-				if (((PolygonE) record.get(i)).equals(((PolygonE) Deleterecord.get(i)))) {
-					return true;
-				}
-			} else {
-				if (record.get(i).equals(Deleterecord.get(i))) {
-					return true;
-				}
+	public static void main(String[] args) {
+		// Vector record = new Vector<Object>(4);
+		// record.add((String) "hobaa");
+		// record.add((int) 4);
+		// record.add((String) "hhh");
+		// Vector Deleterecord = new Vector<Object>(4);
+		// Deleterecord.add(null);
+		// Deleterecord.add((int) 4);
+		// // Deleterecord.add((String) "h1hh");
+		// List<Boolean> indexed = new ArrayList<>();
+		// indexed.add(true);
+		// int pagenum = 0;
+		// int recnum = 0;
+		// System.out.println(SubCompare(record, Deleterecord, indexed, pagenum,
+		// recnum));
+	}
 
+	private static <T extends Comparable<T>> boolean SubCompare(Vector record, Vector Deleterecord,
+			List<Boolean> indexed, int pagenum, int recnum, Table table) throws Exception {
+		Vector<Vector<Integer>> tempVtree;
+		BPTree<T> BPtree;
+		RTree<T> Rtree;
+		boolean returned = false;
+
+		Vector<Integer> tempVector = new Vector<Integer>();
+		for (int i = 0; i < Deleterecord.size() - 1; i++) {
+			if (Deleterecord.get(i) != null && indexed.get(i) == false) {
+				if (record.get(i) instanceof PolygonE && Deleterecord.get(i) instanceof PolygonE) {
+					if (!((PolygonE) record.get(i)).equals(((PolygonE) Deleterecord.get(i))))
+						return returned;
+				} else {
+					if (!record.get(i).equals(Deleterecord.get(i))) {
+						return returned;
+					}
+
+				}
 			}
+			// else if (Deleterecord.get(i) != null && indexed.get(i) == true) {
+			// if (Deleterecord.get(i) instanceof PolygonE) {
+			// Rtree = (RTree<T>) DBApp.StaticgetTree(table.getName(),
+			// table.getColoumn_names().get(i));
+			// tempVtree = Rtree.searchAll((T) DBApp.staticgetpolyInteger((PolygonE)
+			// Deleterecord.get(i)));
+			// tempVector.add(pagenum);
+			// tempVector.add(recnum);
+			// if (tempVtree.indexOf(tempVector) == -1) {
+			// return returned;
+			// }
+			// } else {
+			// BPtree = (BPTree<T>) DBApp.StaticgetTree(table.getName(),
+			// table.getColoumn_names().get(i));
+			// tempVtree = BPtree.searchAll((T) Deleterecord.get(i));
+			// tempVector.add(pagenum);
+			// tempVector.add(recnum);
+			// if (tempVtree.indexOf(tempVector) == -1) {
+			// return returned;
+			// }
+
+			// // if (!record.get(i).equals(Deleterecord.get(i))) {
+			// // return false;
+			// // }
+			// }
+
+			// }
 		}
-		return false;
+		returned = true;
+		return returned;
 
 	}
 
