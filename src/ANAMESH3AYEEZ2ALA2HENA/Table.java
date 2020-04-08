@@ -151,7 +151,6 @@ public class Table implements Serializable {
 	}
 
 	public Vector removefromtable(Vector record) throws Exception {
-		this.getIsindexed();
 		this.update();
 		Vector out = new Vector<String>();
 		for (int i = 0; i < this.pagesreferences.size(); i++) {
@@ -161,11 +160,22 @@ public class Table implements Serializable {
 			if (page.RecordsGetter().isEmpty()) {
 				out.add(page.getPath());
 				this.pagesreferences.remove(i);
+				i--;
 			}
 		}
 		this.update();
 
 		return out;
+	}
+
+	public void removeindfromtable(Vector<Object> dellrecord, Vector<Integer> record)
+			throws IOException, DBAppException {
+		Page page = this.read_page(this.pagesreferences.get(record.get(0)));
+		page.deleteind(dellrecord, record.get(1));
+		if (page.RecordsGetter().isEmpty()) {
+			this.pagesreferences.remove(record.get(0));
+		}
+		this.update();
 	}
 
 }

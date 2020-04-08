@@ -1014,6 +1014,14 @@ public class DBApp<T extends Comparable<T>> {
 
 	}
 
+	public static Integer staticgetpolyInteger(PolygonE object) {
+		int area = 0;
+		Dimension dim1 = object.getBounds().getSize();
+		int p1area = dim1.width * dim1.height;
+
+		return area;
+	}
+
 	public Integer getPolyArea(Polygon p) {
 		int area = 0;
 		Dimension dim1 = p.getBounds().getSize();
@@ -1056,7 +1064,7 @@ public class DBApp<T extends Comparable<T>> {
 			}
 			for (int i = 0; i < table.getIskey().size() - 1; i++) {
 				if (table.getIskey().get(i) == false) {
-					if (table.getDatatype().get(i) == "java.awt.Polygon") {
+					if (table.getDatatype().get(i).equals("java.awt.Polygon")) {
 						PolygonE temp = this
 								.makePolygon((String) htblColNameValue.get(table.getColoumn_names().get(i)));
 						record.add(temp);
@@ -1283,117 +1291,238 @@ public class DBApp<T extends Comparable<T>> {
 	}
 
 	public void deleteFromTable(String tablename, Hashtable<String, Object> htblColNameValue) throws Exception {
-
-		/*
-		 * bos yasta enta lama betgigi te delete betecheck 3ala kaza column tab3an we
-		 * betgib el values
-		 * 
-		 * el haitghaiar howa enak lazem teshof el awel el column da indexed wala mesh
-		 * indexed ya3ni 3ando tree wala la2 law ah fa enta hatro7 tegib el tree beta3to
-		 * we te3mel search biha tab3an hat2oli ezai ha2olak awalan lazem teb2a 3aref
-		 * type el column ya3ni Integer wala Double wala eh bezabt now ma3ak el type hat
-		 * create tree keda BPTree<Integer> tree;
-		 * 
-		 * now enta 3awz el tree beta3tak teb2a zayi el tree el fel memory fa hate3mel
-		 * gettree method tree=getBPlusTree(strTableName, strColName)
-		 * 
-		 * BUT fi 7aga el method di betraga3 object fa hate3melha type cast le type el
-		 * tree beta3tak tree=(BPTree<Integer>)tree=getBPlusTree(strTableName,
-		 * strColName);
-		 * 
-		 * keda enta ma3ak el tree delwa2ti 3awz tegib el records el maslan 3andohom id
-		 * 3
-		 * 
-		 * Vector<Vector<Integer>>=tree.searchAll(new Integer(3));
-		 * 
-		 * da hairaga3lak el indexes beta3t kol el records el fel tree el be 3 bel
-		 * manzar da
-		 * 
-		 * [ [page number,index in page],[page number,index in page],[page number,index
-		 * in page] ] [ [2,3],[2,5],[3,4] ]
-		 * 
-		 * ya3ni hatro7 array page refrences we tegeib refrences.get(page number) haidik
-		 * el page el fiha awel record ba3d keda hate3mel men el page .get(index in
-		 * page) hairaga3lak el record bezabt
-		 * 
-		 * tab3an lazem ta5od balak men el diffrent types we en el tree beteb2a 3ala
-		 * column wa7ed mesh 3al table kolo we momken columns yeb2a liha tree we momken
-		 * la2 plz test carefully 3ashan 3aleha daragat ketir
-		 * 
-		 * ba3d matemsa7 records men page
-		 * 
-		 * always use the indexed columns first enta law fi column fi tree hatgib meno
-		 * el page indexes we ba3d keda law fi column tani maslan leih tree hatgib bardo
-		 * el indexes we teshof el cummon mabenhom we fel a5er tetala3 el records di
-		 * teshof eh menha bei meet el condition el a5ir beta3 el column el mafhosh
-		 * index da
-		 * 
-		 * ba3d matemsa7 kol 7aga men el pages ya me3alem hate3mel call le method esmaha
-		 * refreshBPtree(string tablename,String column name) 3ala kol indexed column
-		 * fel page use the method isIndexed law ah call 3aleh refreshBptree law la2
-		 * dont do anything 3ashan enta lama betemsa7 men el pages amaken el elements
-		 * betetghayar fa lazem ne3mel el tree men el awel tani :D
-		 * 
-		 * 
-		 * if its a polygon dont create b+tree we will implement the R tree in that case
-		 * so just put a comment //create r tree
-		 * 
-		 */
-
+		Vector<Vector<Integer>> pos1 = new Vector<Vector<Integer>>();
+		boolean all = false;
+		boolean foundindexed = false;
+		Vector<Vector<Integer>> pos2 = new Vector<Vector<Integer>>();
+		Vector<Vector<Integer>> bigger = new Vector<Vector<Integer>>();
+		Vector<Vector<Integer>> smaller = new Vector<Vector<Integer>>();
+		// Vector<Object> dellrecord = new Vector<Object>();
 		Table table = this.loadTable(tablename);
 		Vector rest = this.deserilizetable(tablename);
 		table.setPagesreferences((List<String>) rest.get(0));
 		table.setNumofcreatedpages((int) rest.get(1));
+		BPTree btree;
+		RTree rtree;
+		Vector search = new Vector<Vector<Integer>>();
 
-		if (/* this.missorins(table, htblColNameValue) == true */ false) {
-			throw (new DBAppException("missing or inconsisitant data"));
-		} else {
-			// System.out.println("done");
-			Vector record = new Vector();
-			for (int i = 0; i < table.getIskey().size(); i++) {
-				if (table.getIskey().get(i) == true) {
-					if (table.getDatatype().get(i).equals("java.awt.Polygon")) {
-						PolygonE temp = this
-								.makePolygon((String) htblColNameValue.get(table.getColoumn_names().get(i)));
-						record.add(temp);
-					} else {
-						record.add(htblColNameValue.get(table.getColoumn_names().get(i)));
-						// System.out.println(record);
-					}
-					break;
+		// System.out.println("done");
+		Vector record = new Vector();
+		for (int i = 0; i < table.getIskey().size(); i++) {
+			if (table.getIskey().get(i) == true) {
+				if (table.getDatatype().get(i).equals("java.awt.Polygon")) {
+					PolygonE temp = this.makePolygon((String) htblColNameValue.get(table.getColoumn_names().get(i)));
+					record.add(temp);
+				} else {
+					record.add(htblColNameValue.get(table.getColoumn_names().get(i)));
+					// System.out.println(record);
 				}
+				break;
 			}
-			for (int i = 0; i < table.getIskey().size() - 1; i++) {
-				if (table.getIskey().get(i) == false) {
-					if (table.getDatatype().get(i).equals("java.awt.Polygon")) {
-						PolygonE temp = this
-								.makePolygon((String) htblColNameValue.get(table.getColoumn_names().get(i)));
-						record.add(temp);
-					} else {
-						record.add(htblColNameValue.get(table.getColoumn_names().get(i)));
-					}
+		}
+		for (int i = 0; i < table.getIskey().size() - 1; i++) {
+			if (table.getIskey().get(i) == false) {
+				if (table.getDatatype().get(i).equals("java.awt.Polygon")) {
+					PolygonE temp = this.makePolygon((String) htblColNameValue.get(table.getColoumn_names().get(i)));
+					record.add(temp);
+				} else {
+					record.add(htblColNameValue.get(table.getColoumn_names().get(i)));
 				}
-			}
-			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-			Date date = new Date();
-			record.add(formatter.format(date) + "");
-			Vector out = table.removefromtable(record);
-			for (int i = 0; i < table.getColoumn_names().size(); i++) {
-				if (table.getIsindexed().get(i) == true) {
-					if (table.getDatatype().get(i) == "java.awt.Polygon") {
-						refreshRTree(table.getName(), table.getColoumn_names().get(i));
-
-					} else
-						refreshBTree(table.getName(), table.getColoumn_names().get(i));
-				}
-			}
-			for (int i = 0; i < out.size(); i++) {
-				File F = new File(out.get(i) + "");
 			}
 
 		}
+		for (int i = 0; i < table.getIskey().size() - 1; i++) {
+			if (table.getIsindexed().get(i) && record.get(i) != null) {
+				foundindexed = true;
+				pos2.clear();
+				pos2.addAll(pos1);
+				pos1.clear();
+				if (getBPlusTree(tablename, table.getColoumn_names().get(i)) instanceof BPTree) {
+					btree = (BPTree) getBPlusTree(tablename, table.getColoumn_names().get(i));
+					search.clear();
+					search.addAll(btree.searchAll((T) record.get(i)));
+					if (search.size() > pos2.size()) {
 
+						bigger.clear();
+						bigger.addAll(search);
+						smaller.clear();
+						smaller.addAll(pos2);
+					} else {
+						bigger.clear();
+						bigger.addAll(pos2);
+						smaller.clear();
+						smaller.addAll(search);
+					}
+					for (int j = 0; j < bigger.size(); j++) {
+						if (!smaller.contains(bigger.get(j))) {
+							smaller.remove(bigger.get(j));
+						}
+					}
+					pos1.clear();
+					pos1.addAll(smaller);
+					pos2.clear();
+					pos2.addAll(bigger);
+				} else if (getRTree(tablename, table.getColoumn_names().get(i)) instanceof RTree) {
+					rtree = (RTree) getBPlusTree(tablename, table.getColoumn_names().get(i));
+					search.clear();
+					search.addAll(rtree.searchAll(staticgetpolyInteger((PolygonE) record.get(i))));
+					if (search.size() > pos2.size()) {
+						bigger.clear();
+						bigger.addAll(search);
+						smaller.clear();
+						smaller.addAll(pos2);
+					} else {
+						bigger.clear();
+						bigger.addAll(pos2);
+						smaller.clear();
+						smaller.addAll(search);
+					}
+					for (int j = 0; j < bigger.size(); j++) {
+						if (!smaller.contains(bigger.get(j))) {
+							smaller.remove(bigger.get(j));
+						}
+					}
+					pos1.clear();
+					pos1.addAll(smaller);
+					pos2.clear();
+					pos2.addAll(bigger);
+				}
+			} else
+				all = true;
+
+		}
+
+		if (!pos2.isEmpty()) {
+			for (Vector<Integer> orgrecord : pos2) {
+				table.removeindfromtable(record, orgrecord);
+			}
+		} else if (!foundindexed) {
+			table.removefromtable(record);
+
+		}
 	}
+	// public void deleteFromTable(String tablename, Hashtable<String, Object>
+	// htblColNameValue) throws Exception {
+
+	// /*
+	// * bos yasta enta lama betgigi te delete betecheck 3ala kaza column tab3an we
+	// * betgib el values
+	// *
+	// * el haitghaiar howa enak lazem teshof el awel el column da indexed wala mesh
+	// * indexed ya3ni 3ando tree wala la2 law ah fa enta hatro7 tegib el tree
+	// beta3to
+	// * we te3mel search biha tab3an hat2oli ezai ha2olak awalan lazem teb2a 3aref
+	// * type el column ya3ni Integer wala Double wala eh bezabt now ma3ak el type
+	// hat
+	// * create tree keda BPTree<Integer> tree;
+	// *
+	// * now enta 3awz el tree beta3tak teb2a zayi el tree el fel memory fa hate3mel
+	// * gettree method tree=getBPlusTree(strTableName, strColName)
+	// *
+	// * BUT fi 7aga el method di betraga3 object fa hate3melha type cast le type el
+	// * tree beta3tak tree=(BPTree<Integer>)tree=getBPlusTree(strTableName,
+	// * strColName);
+	// *
+	// * keda enta ma3ak el tree delwa2ti 3awz tegib el records el maslan 3andohom
+	// id
+	// * 3
+	// *
+	// * Vector<Vector<Integer>>=tree.searchAll(new Integer(3));
+	// *
+	// * da hairaga3lak el indexes beta3t kol el records el fel tree el be 3 bel
+	// * manzar da
+	// *
+	// * [ [page number,index in page],[page number,index in page],[page
+	// number,index
+	// * in page] ] [ [2,3],[2,5],[3,4] ]
+	// *
+	// * ya3ni hatro7 array page refrences we tegeib refrences.get(page number)
+	// haidik
+	// * el page el fiha awel record ba3d keda hate3mel men el page .get(index in
+	// * page) hairaga3lak el record bezabt
+	// *
+	// * tab3an lazem ta5od balak men el diffrent types we en el tree beteb2a 3ala
+	// * column wa7ed mesh 3al table kolo we momken columns yeb2a liha tree we
+	// momken
+	// * la2 plz test carefully 3ashan 3aleha daragat ketir
+	// *
+	// * ba3d matemsa7 records men page
+	// *
+	// * always use the indexed columns first enta law fi column fi tree hatgib meno
+	// * el page indexes we ba3d keda law fi column tani maslan leih tree hatgib
+	// bardo
+	// * el indexes we teshof el cummon mabenhom we fel a5er tetala3 el records di
+	// * teshof eh menha bei meet el condition el a5ir beta3 el column el mafhosh
+	// * index da
+	// *
+	// * ba3d matemsa7 kol 7aga men el pages ya me3alem hate3mel call le method
+	// esmaha
+	// * refreshBPtree(string tablename,String column name) 3ala kol indexed column
+	// * fel page use the method isIndexed law ah call 3aleh refreshBptree law la2
+	// * dont do anything 3ashan enta lama betemsa7 men el pages amaken el elements
+	// * betetghayar fa lazem ne3mel el tree men el awel tani :D
+	// *
+	// *
+	// * if its a polygon dont create b+tree we will implement the R tree in that
+	// case
+	// * so just put a comment //create r tree
+	// *
+	// */
+
+	// Table table = this.loadTable(tablename);
+	// Vector rest = this.deserilizetable(tablename);
+	// table.setPagesreferences((List<String>) rest.get(0));
+	// table.setNumofcreatedpages((int) rest.get(1));
+
+	// if (/* this.missorins(table, htblColNameValue) == true */ false) {
+	// throw (new DBAppException("missing or inconsisitant data"));
+	// } else {
+	// // System.out.println("done");
+	// Vector record = new Vector();
+	// for (int i = 0; i < table.getIskey().size(); i++) {
+	// if (table.getIskey().get(i) == true) {
+	// if (table.getDatatype().get(i).equals("java.awt.Polygon")) {
+	// PolygonE temp = this
+	// .makePolygon((String) htblColNameValue.get(table.getColoumn_names().get(i)));
+	// record.add(temp);
+	// } else {
+	// record.add(htblColNameValue.get(table.getColoumn_names().get(i)));
+	// // System.out.println(record);
+	// }
+	// break;
+	// }
+	// }
+	// for (int i = 0; i < table.getIskey().size() - 1; i++) {
+	// if (table.getIskey().get(i) == false) {
+	// if (table.getDatatype().get(i).equals("java.awt.Polygon")) {
+	// PolygonE temp = this
+	// .makePolygon((String) htblColNameValue.get(table.getColoumn_names().get(i)));
+	// record.add(temp);
+	// } else {
+	// record.add(htblColNameValue.get(table.getColoumn_names().get(i)));
+	// }
+	// }
+	// }
+	// SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+	// Date date = new Date();
+	// record.add(formatter.format(date) + "");
+	// Vector out = table.removefromtable(record);
+	// for (int i = 0; i < table.getColoumn_names().size(); i++) {
+	// if (table.getIsindexed().get(i) == true) {
+	// if (table.getDatatype().get(i) == "java.awt.Polygon") {
+	// refreshRTree(table.getName(), table.getColoumn_names().get(i));
+
+	// } else
+	// refreshBTree(table.getName(), table.getColoumn_names().get(i));
+	// }
+	// }
+	// for (int i = 0; i < out.size(); i++) {
+	// File F = new File(out.get(i) + "");
+	// }
+
+	// }
+
+	// }
 
 	public String Gettime() {
 		Date date = new Date();
