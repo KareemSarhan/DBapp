@@ -1,5 +1,5 @@
 Table Name,Column Name,Column Type,Key,Indexed
-delete,id,java.lang.Integer,True,True
-delete,name,java.lang.String,False,False
-delete,area,java.awt.Polygon,False,False
+delete,id,java.lang.Integer,True,False
+delete,name,java.lang.String,False,True
+delete,area,java.awt.Polygon,False,True
 delete,TouchDate,java.util.Date,False,False
