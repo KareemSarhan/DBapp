@@ -244,7 +244,7 @@ public class Page implements Serializable {
 		// System.out.println(p1area+" "+p2area);
 		if (p1area > p2area) {
 			n = 1;
-		} else if (p1area == p2area) {
+		} else if (Arrays.equals(p1.xpoints,p2.xpoints)&&Arrays.equals(p1.ypoints,p2.ypoints)) {
 			n = 0;
 		} else if (p1area < p2area) {
 			n = -1;

@@ -2,8 +2,12 @@ package ANAMESH3AYEEZ2ALA2HENA;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.ObjectInputStream.GetField;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Vector;
+
+import javax.swing.plaf.basic.BasicTreeUI;
 
 import BPTree.BPTree;
 import RTree.RTree;
@@ -13,6 +17,10 @@ import RTree.RTree;
 public class DBAppTest {
 
 	public static<T extends Comparable<T>> void main(String[] args) throws Exception {
+		DBApp d=new DBApp();
+		BPTree<T> tree=(BPTree<T>)d.getBPlusTree("adfsfsa", "dsafa");
+		Vector<Vector<Integer>> t=tree.searchAll((T)new Double(3.3));
+		
 	//	System.out.println("balabizo");
 		//String strTableName = "test";
 		//DBApp dbApp = new DBApp();
@@ -85,7 +93,7 @@ public class DBAppTest {
 		}
 		*/
 		//dbApp.createBTreeIndex(strTableName, "id");
-		
+		/*
 		SQLTerm[] arrSQLTerms;
 		arrSQLTerms = new SQLTerm[2];
 		int i=0;
@@ -95,7 +103,7 @@ public class DBAppTest {
 		}
 		arrSQLTerms[0]._strTableName = "gay";
 		arrSQLTerms[0]._strColumnName= "area";
-		arrSQLTerms[0]._strOperator = "!=";//=,<=,>=,>,<
+		arrSQLTerms[0]._strOperator = "=";//=,<=,>=,>,<
 		arrSQLTerms[0]._objValue = new Integer(1);
 		arrSQLTerms[1]._strTableName = "gay";
 		arrSQLTerms[1]._strColumnName= "id";
@@ -120,7 +128,7 @@ public class DBAppTest {
 			System.out.println(result.next());
 		}
 		
-		
+		*/
 
 	//-------------------------------------CreateBPlustree Testing-----------------------------------------------	
 		
@@ -156,17 +164,13 @@ public class DBAppTest {
 	//	System.out.println(b.searchAll("miro"));
 		
 		//dbApp.createRTreeIndex(strTableName, "area");
-		RTree<T> r=dbApp.getRTree(strTableName, "area");
-
-		Hashtable htblColNameValue = new Hashtable( );
-		htblColNameValue.put("id", new Integer( i ));
-		htblColNameValue.put("name", new String("miro" ) );
-		htblColNameValue.put("area", new String("(0,3),(0,5),(4,9),(12,0)") );
-		dbApp.insertIntoTable( strTableName , htblColNameValue );
-		dbApp.refreshRTree(strTableName, "area");
-		r=dbApp.getRTree(strTableName, "area");
 		
+		
+		BPTree<T> tr;//getbplustree method
+		RTree<T> rt;//getretreemethod
 		
 	}
+	//
+	
 
 }

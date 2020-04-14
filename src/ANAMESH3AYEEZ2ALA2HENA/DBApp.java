@@ -17,6 +17,7 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -287,8 +288,13 @@ public class DBApp <T extends Comparable<T>> {
   }
   
   
-  public RTree<T> getRTree(String strTableName,String strColName)throws Exception{
+  public <T extends Comparable<T>>RTree<T> getRTree(String strTableName,String strColName)throws Exception{
+	  BPTree<T> tree1=(BPTree<T>) getBPlusTree(strTableName, strColName);
+	  RTree<T>  tree=getRTree(strTableName, strColName);
+	  
 	  RTree<T> o=new RTree<T>(3);
+	  
+	  
 	  try
       {    
           // Reading the object from a file 
@@ -1587,7 +1593,7 @@ public class DBApp <T extends Comparable<T>> {
     int p2area = dim2.width * dim2.height;
     if (p1area > p2area) {
       n = 1;
-    } else if (p1area == p2area) {
+    } else if (Arrays.equals(p1.xpoints,p2.xpoints)&&Arrays.equals(p1.ypoints,p2.ypoints)) {
       n = 0;
     } else if (p1area < p2area) {
       n = -1;
@@ -1610,7 +1616,7 @@ public class DBApp <T extends Comparable<T>> {
     int p2area = dim2.width * dim2.height;
     if (p1area > p2area) {
       n = 1;
-    } else if (p1area == p2area) {
+    } else if (Arrays.equals(p1.xpoints,p2.xpoints)&&Arrays.equals(p1.ypoints,p2.ypoints)) {
       n = 0;
     } else if (p1area < p2area) {
       n = -1;

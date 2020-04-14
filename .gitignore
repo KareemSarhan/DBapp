@@ -1,1 +1,5 @@
 /target/
+*.bin
+data/gayid
+*.csv
+*.csv
