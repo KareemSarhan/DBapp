@@ -371,14 +371,16 @@ public class BPTree<T extends Comparable<T>> implements Serializable{
 		BPTreeLeafNode<T> leaf=(BPTreeLeafNode)curNode;
 		
 		
-		while(leaf.getNext()!=null) {
+		while(leaf!=null) {
 			Comparable<T>[] keys=leaf.keys;
 			
 			for(int i=0;i<keys.length;i++) {
 				//System.out.print(keys[i]+" ");
 				if(keys[i].compareTo(key)>0) {
 					
-					Ref ref=tito.search(key);
+					Ref ref=tito.search((T)keys[i]);
+					
+					
 					index[0]=ref.getPage();
 					index[1]=ref.getIndexInPage();
 					return index;

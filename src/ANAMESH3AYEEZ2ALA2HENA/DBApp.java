@@ -1113,7 +1113,7 @@ public class DBApp <T extends Comparable<T>> {
   public Integer getPolyArea(Polygon p) {
 	  int area=0;
 	  Dimension dim1 = p.getBounds().getSize();
-	  int p1area = dim1.width * dim1.height;
+	  area = dim1.width * dim1.height;
 	  
 	  return area;
   }
@@ -1125,7 +1125,8 @@ public class DBApp <T extends Comparable<T>> {
 	int area=0;
 	Polygon p1= makePolygon(s);
 	Dimension dim1 = p1.getBounds().getSize();
-    int p1area = dim1.width * dim1.height;
+    area = dim1.width * dim1.height;
+    
 	  return area;
   }
   

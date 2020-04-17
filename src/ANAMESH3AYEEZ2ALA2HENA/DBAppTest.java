@@ -1,5 +1,6 @@
 package ANAMESH3AYEEZ2ALA2HENA;
 
+import java.awt.Polygon;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream.GetField;
@@ -10,6 +11,7 @@ import java.util.Vector;
 import javax.swing.plaf.basic.BasicTreeUI;
 
 import BPTree.BPTree;
+import BPTree.Ref;
 import RTree.RTree;
 
 @SuppressWarnings("all")
@@ -17,9 +19,23 @@ import RTree.RTree;
 public class DBAppTest {
 
 	public static<T extends Comparable<T>> void main(String[] args) throws Exception {
-		DBApp d=new DBApp();
-		BPTree<T> tree=(BPTree<T>)d.getBPlusTree("adfsfsa", "dsafa");
-		Vector<Vector<Integer>> t=tree.searchAll((T)new Double(3.3));
+	
+		BPTree<T> tree =new BPTree<T>(2);
+		
+		tree.insert((T)new Integer(2),new Ref(2,3));
+		tree.insert((T)new Integer(3),new Ref(4,2));
+		tree.insert((T)new Integer(5),new Ref(4,2));
+		
+		//System.out.println(tree.wezwez((T)new Integer(6))[0]);
+		
+		DBApp db=new DBApp();
+		Polygon p=db.makePolygon("(0,0),(2,1),(6,9),(3,3)");
+		System.out.println(p.xpoints[3]);
+		System.out.println(db.getPolyArea("(0,0),(2,1),(6,9),(3,3)"));	
+		
+		
+		
+	//	Vector<Vector<Integer>> t=tree.searchAll((T)new Double(3.3));
 		
 	//	System.out.println("balabizo");
 		//String strTableName = "test";
@@ -67,9 +83,9 @@ public class DBAppTest {
 		
 		
 //---------------------------------Select Tests---------------------------
-		String strTableName = "gay";
-		DBApp dbApp = new DBApp( );
-		dbApp.init();
+	//	String strTableName = "gay";
+	//	DBApp dbApp = new DBApp( );
+		//dbApp.init();
 		
 		/*
 		Hashtable htblColNameType = new Hashtable( );
