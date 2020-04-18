@@ -1164,7 +1164,7 @@ public class DBApp <T extends Comparable<T>> {
 	    {
 	    	if((boolean)table.getIsindexed().get(i)==true)
 	    	{
-	    		if(table.getDatatype().get(i).equals("Java.awt.polygon"))
+	    		if(table.getDatatype().get(i).equals("Java.awt.Polygon"))
 	    		{
 	    			this.refreshRTree(table.getName(), (String) table.getColoumn_names().get(i));
 	    		}
