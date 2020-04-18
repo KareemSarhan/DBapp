@@ -25,9 +25,12 @@ public class Page implements Serializable {
 		try {
 			writer = new PrintWriter(this.path, "UTF-8");
 
-		
+		} catch (FileNotFoundException | UnsupportedEncodingException e) {
+			System.out.print("Failer");
 
-		InputStream input = new FileInputStream("config/DBApp.properties");
+		}
+
+		try (InputStream input = new FileInputStream("config/DBApp.properties")) {
 
 			Properties prop = new Properties();
 
@@ -36,17 +39,11 @@ public class Page implements Serializable {
 			prop.load(input);
 
 			// get the property value and print it out
-			this.maxnumrecords = Integer.parseInt(prop.getProperty("MaximumRowsCountinPage")) ;
-			 
-			writer.flush();writer.close();
-		} catch (Exception ex) {
-			this.maxnumrecords=5;
-			
-			
+			this.maxnumrecords = Integer.parseInt(prop.getProperty("MaximumRowsCountinPage"));
 
-
+		} catch (IOException ex) {
+			throw new DBAppException("Error with properties file");
 		}
-		
 
 	}
 
@@ -135,16 +132,6 @@ public class Page implements Serializable {
 		this.update();
 		return null;
 
-	}
-	public void quickadd(int loc,Vector record) throws IOException, DBAppException
-	{
-		this.records.add(loc, record);
-		this.update();
-	}
-	public void removelastrecord() throws IOException, DBAppException
-	{
-		this.records.removeElementAt(this.records.size()-1);
-		this.update();
 	}
 
 	public void display() {
@@ -304,141 +291,100 @@ public class Page implements Serializable {
 			}
 			return false;
 
-		}  else if (x instanceof Date) {
+		} else if (x instanceof String) {
+			if (((String) x).compareTo((String) y) > 0) {
+				return true;
+			}
+			return false;
+
+		} else if (x instanceof Date) {
 			Date temp1 = (Date) x;
 			Date temp2 = (Date) y;
 			if (temp1.compareTo(temp2) > 0) {
 				return true;
 			}
 			return false;
-		} 
-			else  {
-				try
-				{
-				int n=polygonCompare((String)x,(String)y);
-				if (n <= 0) {
-			    //System.out.println(1);
+		} else {
+			int n = polygonCompare((PolygonE) x, (PolygonE) y);
+			if (n <= 0) {
 				return true;
-				}
-				//System.out.println(1.1);
-				return false;
-				}
-				catch(Exception e)
-				{
-					if (((String) x).compareTo((String) y) <= 0) {
-						//System.out.println(2);
-					return true;
-				}
-					//System.out.println(2.1);
-				return false;
-				}
-				
-
-
 			}
+			return false;
+		}
 	}
 
-	public static PolygonE makePolygon(String s) throws DBAppException {
-	    // this method takes the input string from the user
-	    // and parses the string into polygon and returns the poly
-	    PolygonE p = new PolygonE();
-	    s = s.replace("(", "");
-	    s = s.replace(")", "");
-	    String[] points = s.split(",");
+	public static int polygonCompare(PolygonE p1, PolygonE p2) {
+		// if the first polygon is bigger it returns 1;
+		// if the 2nd polygon is bigger it returns -1
+		// if they are equal it returns 0
+		int n = -2;
+		Dimension dim1 = p1.getBounds().getSize();
+		int p1area = dim1.width * dim1.height;
 
-	    try {
-	      for (int i = 0; i < points.length; i = i + 2) {
-	        int x = Integer.parseInt(points[i]);
-	        int y = Integer.parseInt(points[i + 1]);
-	        p.addPoint(x, y);
-	      }
-	    } catch (NumberFormatException e) {
-	      throw new DBAppException("Wrong polygon format");
-	    } catch (ArrayIndexOutOfBoundsException e) {
-	      throw new DBAppException("Not enough points for polygon");
-	    }
+		Dimension dim2 = p2.getBounds().getSize();
+		int p2area = dim2.width * dim2.height;
+		// System.out.println(p1area+" "+p2area);
+		if (p1area > p2area) {
+			n = 1;
+		} else if (p1area == p2area) {
+			n = 0;
+		} else if (p1area < p2area) {
+			n = -1;
+		}
 
-	    return p;
-	  }
-	
-	 public static int polygonCompare(String s1, String s2) throws DBAppException {
-		    // if the first polygon is bigger it returns 1;
-		    // if the 2nd polygon is bigger it returns -1
-		    // if they are equal it returns 0
-		    Polygon p1 = makePolygon(s1);
-		    Polygon p2 = makePolygon(s2);
-		    int n = -2;
-		    Dimension dim1 = p1.getBounds().getSize();
-		    int p1area = dim1.width * dim1.height;
+		return n;
+	}
 
-		    Dimension dim2 = p2.getBounds().getSize();
-		    int p2area = dim2.width * dim2.height;
-		    if (p1area > p2area) {
-		      n = 1;
-		    } else if (p1area == p2area) {
-		      n = 0;
-		    } else if (p1area < p2area) {
-		      n = -1;
-		    }
-		    return n;
-		  }
+	// public static void main(String[]args) throws DBAppException, IOException
+	//// {
+	////
+	//// try {
+	//// ObjectInputStream o;
+	//// o = new ObjectInputStream( new FileInputStream("final0.bin"));
+	//// Page p = (Page) o.readObject();
+	//// //System.out.print(p.ID);
+	//// p.display();
+	////// Vector rec=new Vector();
+	////// rec.add(1);
+	//////
+	////// p.insertpage(rec);
+	//////
+	////// p.display();
+	////
+	////
+	//// } catch (Exception e) {
+	////
+	//// //System.out.print(e.p);
+	//// e.printStackTrace();
+	//// }
+	////
+	// }
 }
-
-//	 public static void main(String[]args) throws DBAppException, IOException
-//	 {
-////		 Page p=new Page("final");
-////		 Vector rec=new Vector();
-////		 rec.add("(10,20),(30,30),(40,40),(50,60)");
-////		 p.insertpage(rec);
-////		 System.out.print(p.records);
-//	////
-//	 try {
-//	 ObjectInputStream o;
-//	 o = new ObjectInputStream( new FileInputStream("final.bin"));
-//	 Page p = (Page) o.readObject();
-//	 System.out.println(p.maxnumrecords);
-//	 //p.display();
-//	 Vector rec=new Vector();
-//	 rec.add("c");
-//	
-//	 p.insertpage(rec);
-//	
-//	 p.display();
-//	
-//	
-//	 } catch (Exception e) {
-//	
-//	 //System.out.print(e.p);
-//	 e.printStackTrace();
-//	 }
-//	////
-//	 }
-//}
-//// if ((record.get(0) instanceof PolygonE) && (Deleterecord.get(0) instanceof
-//// PolygonE)) {
-//// if (!((PolygonE) record.get(0)).equals((PolygonE) Deleterecord.get(0))) {
-//// flag = flag & false;
-//// // they are not equal if they got here
-//// } else if (!record.get(0).equals(Deleterecord.get(0))) {
-//// flag = flag & false;
-//// }
-//// }
-//// for (int i = 1; i < Deleterecord.size(); i++) {
-//// // if delete record has a value and this value is equal to the value of the
-//// // record
-//// // then this record will be deleted
-//// if (record.get(i) instanceof PolygonE && Deleterecord.get(i) instanceof
-//// PolygonE
-//// && Deleterecord.get(i) != null
-//// && !((PolygonE) record.get(i)).equals((PolygonE) Deleterecord.get(i)))
-//// flag = flag & false;
-//// }
-//// for (int i = 1; i < Deleterecord.size(); i++) {
-//// // if delete record has a value and this value is equal to the value of the
-//// // record
-//// // then this record will be deleted
-//// if (Deleterecord.get(i) != null &&
-//// !Deleterecord.get(i).equals(record.get(i)))
-//// flag = flag & false;
-//// }
-//// return flag;
+// if ((record.get(0) instanceof PolygonE) && (Deleterecord.get(0) instanceof
+// PolygonE)) {
+// if (!((PolygonE) record.get(0)).equals((PolygonE) Deleterecord.get(0))) {
+// flag = flag & false;
+// // they are not equal if they got here
+// } else if (!record.get(0).equals(Deleterecord.get(0))) {
+// flag = flag & false;
+// }
+// }
+// for (int i = 1; i < Deleterecord.size(); i++) {
+// // if delete record has a value and this value is equal to the value of the
+// // record
+// // then this record will be deleted
+// if (record.get(i) instanceof PolygonE && Deleterecord.get(i) instanceof
+// PolygonE
+// && Deleterecord.get(i) != null
+// && !((PolygonE) record.get(i)).equals((PolygonE) Deleterecord.get(i)))
+// flag = flag & false;
+// }
+// for (int i = 1; i < Deleterecord.size(); i++) {
+// // if delete record has a value and this value is equal to the value of the
+// // record
+// // then this record will be deleted
+// if (Deleterecord.get(i) != null &&
+// !Deleterecord.get(i).equals(record.get(i)))
+// flag = flag & false;
+// }
+// return flag;

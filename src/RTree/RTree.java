@@ -394,7 +394,7 @@ public class RTree<T extends Comparable<T>> implements Serializable{
 				//System.out.print(keys[i]+" ");
 				if(keys[i].compareTo(key)>0) {
 					
-					RTRef ref=tito.search((T)keys[i]);
+					RTRef ref=tito.search(key);
 					index[0]=ref.getPage();
 					index[1]=ref.getIndexInPage();
 					return index;
@@ -403,7 +403,7 @@ public class RTree<T extends Comparable<T>> implements Serializable{
 			}
 			leaf=leaf.getNext();
 		}
-		return index;
+		return null;
 		
 	}
 	
