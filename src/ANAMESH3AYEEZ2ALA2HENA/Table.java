@@ -334,16 +334,17 @@ public class Table implements Serializable {
 		return null;
 	}
 
-	public Vector removefromtable(Vector record) throws IOException, DBAppException {
+	public Vector removefromtable(Vector record) throws Exception {
 		this.update();
 		Vector out = new Vector<String>();
 		for (int i = 0; i < this.pagesreferences.size(); i++) {
 			Page page = this.read_page(this.pagesreferences.get(i));
-			System.err.println(page.delete(record));
+			System.err.println(page.delete(record, this.getIsindexed(), i, this));
 
 			if (page.RecordsGetter().isEmpty()) {
 				out.add(page.getPath());
 				this.pagesreferences.remove(i);
+				i--;
 			}
 		}
 		this.update();
@@ -355,4 +356,15 @@ public static void main(String[]args) throws Exception
 	Table t=new Table("weza");
 	System.out.print(t.read_page("finaloooo0.bin").RecordsGetter());
 }
+
+	public void removeindfromtable(Vector<Object> dellrecord, Vector<Integer> record)
+			throws IOException, DBAppException {
+		Page page = this.read_page(this.pagesreferences.get(record.get(0)));
+		page.deleteind(dellrecord, record.get(1));
+		if (page.RecordsGetter().isEmpty()) {
+			this.pagesreferences.remove(record.get(0));
+		}
+		this.update();
+	}
+
 }

@@ -9,6 +9,33 @@ import RTree.RTree;
 @SuppressWarnings("all")
 
 public class DBAppTest {
+	public static void main(String[] args) throws Exception {
+		String strTableName = "delete";
+		DBApp dbApp = new DBApp();
+		dbApp.init();
+		// createtablemain(dbApp, strTableName);
+		// deletemain();
+		// // // dbApp.displayer("delete");
+		// // dbApp.createRTreeIndex(strTableName, "area");
+		Hashtable htblColNameValue;
+		// htblColNameValue = new Hashtable();
+		// // htblColNameValue.put("id", new Integer(5));
+		// // htblColNameValue.put("name", new String("miro" + 3));
+		// htblColNameValue.put("area", new String("(0,0),(0,0),(0,0),(0,0)"));
+		// // dbApp.insertIntoTable(strTableName, htblColNameValue);
+		htblColNameValue = new Hashtable();
+		// dbApp.createBTreeIndex(strTableName, "area");
+		htblColNameValue.put("id", 13);
+		htblColNameValue.put("name", new String("miro" + 13));
+		// htblColNameValue.put("area", new String("(0,0),(0,0),(0,0),(0,0)"));
+		dbApp.deleteFromTable(strTableName, htblColNameValue);
+		// dbApp.createBTreeIndex(strTableName, "area");
+		// dbApp.createBTreeIndex(strTableName, "name");
+		dbApp.refreshBTree(strTableName, "id");
+		dbApp.refreshBTree(strTableName, "name");
+		dbApp.refreshBTree(strTableName, "area");
+		dbApp.displayer("delete");
+	}
 
 	public static<T extends Comparable<T>> void main(String[] args) throws Exception {
 	
@@ -132,17 +159,28 @@ public class DBAppTest {
 		}
 		
 		*/
+	private static void deletemain() throws DBAppException, IOException {
+		String strTableName = "delete";
 
-	//-------------------------------------CreateBPlustree Testing-----------------------------------------------	
-		
-	/*	String strTableName = "gay";
-		DBApp dbApp = new DBApp( );
+		DBApp dbApp = new DBApp();
 		dbApp.init();
-		
-		/*
-		Hashtable htblColNameType = new Hashtable( );
+		Hashtable htblColNameValue;
+		for (int i = 0; i < 400; i++) {
+			htblColNameValue = new Hashtable();
+			htblColNameValue.put("id", new Integer(i % 25));
+			htblColNameValue.put("name", new String("miro" + i % 35));
+			htblColNameValue.put("area", new String("(0,0),(0,0),(0,0),(0,0)"));
+			dbApp.insertIntoTable(strTableName, htblColNameValue);
+		}
+		// dbApp.createBTreeIndex(strTableName, "name");
+		// dbApp.displayer("delete");
+
+	}
+
+	private static void createtablemain(DBApp dbApp, String strTableName) throws DBAppException, IOException {
+		Hashtable htblColNameType = new Hashtable();
 		htblColNameType.put("id", "java.lang.Integer");
-	    htblColNameType.put("name", "java.lang.String");
+		htblColNameType.put("name", "java.lang.String");
 		htblColNameType.put("area", "java.awt.Polygon");
 		dbApp.createTable( strTableName, "id", htblColNameType );
 		
@@ -175,5 +213,6 @@ public class DBAppTest {
 	}
 	//
 	
+
 
 }
