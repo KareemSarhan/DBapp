@@ -289,8 +289,7 @@ public class DBApp <T extends Comparable<T>> {
   
   
   public <T extends Comparable<T>>RTree<T> getRTree(String strTableName,String strColName)throws Exception{
-	  BPTree<T> tree1=(BPTree<T>) getBPlusTree(strTableName, strColName);
-	  RTree<T>  tree=getRTree(strTableName, strColName);
+	  
 	  
 	  RTree<T> o=new RTree<T>(3);
 	  
