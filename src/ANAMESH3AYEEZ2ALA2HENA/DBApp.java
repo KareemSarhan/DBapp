@@ -17,7 +17,6 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -288,12 +287,8 @@ public class DBApp <T extends Comparable<T>> {
   }
   
   
-  public <T extends Comparable<T>>RTree<T> getRTree(String strTableName,String strColName)throws Exception{
-	  
-	  
+  public RTree<T> getRTree(String strTableName,String strColName)throws Exception{
 	  RTree<T> o=new RTree<T>(3);
-	  
-	  
 	  try
       {    
           // Reading the object from a file 
@@ -1112,7 +1107,7 @@ public class DBApp <T extends Comparable<T>> {
   public Integer getPolyArea(Polygon p) {
 	  int area=0;
 	  Dimension dim1 = p.getBounds().getSize();
-	  area = dim1.width * dim1.height;
+	  int p1area = dim1.width * dim1.height;
 	  
 	  return area;
   }
@@ -1124,56 +1119,64 @@ public class DBApp <T extends Comparable<T>> {
 	int area=0;
 	Polygon p1= makePolygon(s);
 	Dimension dim1 = p1.getBounds().getSize();
-    area = dim1.width * dim1.height;
-    
+    int p1area = dim1.width * dim1.height;
 	  return area;
   }
   
 
   public void insertIntoTable(String tablename, Hashtable<String, Object> htblColNameValue)
-      throws DBAppException, IOException {
-    Table table = this.loadTable(tablename);
-    Vector rest = this.deserilizetable(tablename);
-    table.setPagesreferences((List<String>) rest.get(0));
-    table.setNumofcreatedpages((int) rest.get(1));
-    if (this.missorins(table, htblColNameValue) == true) {
-      throw (new DBAppException("missing or inconsisitant data"));
-    } else {
-      
-      Vector record = new Vector();
-      for (int i = 0; i < table.getIskey().size(); i++) {
-        if (table.getIskey().get(i) == true) {
-          if (((String) table.getDatatype().get(i)).equals("java.awt.Polygon")) {
-            PolygonE temp = this.makePolygon((String) htblColNameValue.get(table.getColoumn_names().get(i)));
-            record.add(temp);
-          } else {
-            record.add(htblColNameValue.get(table.getColoumn_names().get(i)));
-            // System.out.println(record);
-          }
-          break;
-        }
-      }
-      for (int i = 0; i < table.getIskey().size() - 1; i++) {
-        if (table.getIskey().get(i) == false) {
-          if (table.getDatatype().get(i) == "java.awt.Polygon") {
-            PolygonE temp = this.makePolygon((String) htblColNameValue.get(table.getColoumn_names().get(i)));
-            record.add(temp);
-          } else {
-            record.add(htblColNameValue.get(table.getColoumn_names().get(i)));
-          }
-        }
-      }
-      SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-      Date date = new Date();
+	      throws Exception {
+	    Table table = this.loadTable(tablename);
+	    Vector rest = this.deserilizetable(tablename);
+	    table.setPagesreferences((List<String>) rest.get(0));
+	    table.setNumofcreatedpages((int) rest.get(1));
+	    if (this.missorins(table, htblColNameValue) == true) 
+		    {
+		      throw (new DBAppException("missing or inconsisitant data"));
+		    } 
+	    else {
+	      
+	      Vector record = new Vector();
+	      for (int i = 0; i < table.getIskey().size(); i++) {
+	        if ((boolean)table.getIskey().get(i) == true) {
+	          
+	            record.add(htblColNameValue.get(table.getColoumn_names().get(i)));
+	            // System.out.println(record);
+	          
+	          break;
+	        }
+	      }
+	      for (int i = 0; i < table.getIskey().size() - 1; i++) {
+	        if ((boolean)table.getIskey().get(i) == false) {
+	          
+	            record.add(htblColNameValue.get(table.getColoumn_names().get(i)));
+	          
+	        }
+	      }
+	      SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+	      Date date = new Date();
 
-      record.add(formatter.format(date) + "");
-      table.inserttotable(record);
-      // System.out.print(table.getPagesreferences());
-    }
-    
-    
-    
-  }
+	      record.add(formatter.format(date) + "");
+	      table.inserttotablemain(record);
+	     // System.out.print(record);
+	    }
+	    for(int i=0;i<table.getIsindexed().size();i++)
+	    {
+	    	if((boolean)table.getIsindexed().get(i)==true)
+	    	{
+	    		if(table.getDatatype().get(i).equals("Java.awt.polygon"))
+	    		{
+	    			this.refreshRTree(table.getName(), (String) table.getColoumn_names().get(i));
+	    		}
+	    		else
+	    		{
+	    			this.refreshBTree(table.getName(), (String) table.getColoumn_names().get(i));
+	    		}
+	    	}
+	    }
+	    
+	    
+	  }
 
   
   public static List<String> deserilizetableOLD(String tblname) {
@@ -1593,7 +1596,7 @@ public class DBApp <T extends Comparable<T>> {
     int p2area = dim2.width * dim2.height;
     if (p1area > p2area) {
       n = 1;
-    } else if (Arrays.equals(p1.xpoints,p2.xpoints)&&Arrays.equals(p1.ypoints,p2.ypoints)) {
+    } else if (p1area == p2area) {
       n = 0;
     } else if (p1area < p2area) {
       n = -1;
@@ -1616,7 +1619,7 @@ public class DBApp <T extends Comparable<T>> {
     int p2area = dim2.width * dim2.height;
     if (p1area > p2area) {
       n = 1;
-    } else if (Arrays.equals(p1.xpoints,p2.xpoints)&&Arrays.equals(p1.ypoints,p2.ypoints)) {
+    } else if (p1area == p2area) {
       n = 0;
     } else if (p1area < p2area) {
       n = -1;

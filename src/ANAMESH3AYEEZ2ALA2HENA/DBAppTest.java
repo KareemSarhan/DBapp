@@ -1,17 +1,9 @@
 package ANAMESH3AYEEZ2ALA2HENA;
 
-import java.awt.Polygon;
-import java.io.File;
-import java.io.IOException;
-import java.io.ObjectInputStream.GetField;
 import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Vector;
-
-import javax.swing.plaf.basic.BasicTreeUI;
 
 import BPTree.BPTree;
-import BPTree.Ref;
+import RTree.RTRef;
 import RTree.RTree;
 
 @SuppressWarnings("all")
@@ -20,19 +12,14 @@ public class DBAppTest {
 
 	public static<T extends Comparable<T>> void main(String[] args) throws Exception {
 	
-		BPTree<T> tree =new BPTree<T>(2);
 		
-		tree.insert((T)new Integer(2),new Ref(2,3));
-		tree.insert((T)new Integer(3),new Ref(4,2));
-		tree.insert((T)new Integer(5),new Ref(4,2));
 		
-		//System.out.println(tree.wezwez((T)new Integer(6))[0]);
 		
-		DBApp db=new DBApp();
-		Polygon p=db.makePolygon("(0,0),(2,1),(6,9),(3,3)");
-		System.out.println(p.xpoints[3]);
-		System.out.println(db.getPolyArea("(0,0),(2,1),(6,9),(3,3)"));	
+		// run this loop multiple times to get duplicate records
+		// u can change some elements in the loop to have difrrent records
 		
+		
+
 		
 		
 	//	Vector<Vector<Integer>> t=tree.searchAll((T)new Double(3.3));
