@@ -403,7 +403,7 @@ public class RTree<T extends Comparable<T>> implements Serializable{
 			}
 			leaf=leaf.getNext();
 		}
-		return null;
+		return index;
 		
 	}
 	
