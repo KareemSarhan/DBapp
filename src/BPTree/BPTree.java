@@ -377,6 +377,7 @@ public class BPTree<T extends Comparable<T>> implements Serializable{
 			
 			for(int i=0;i<keys.length;i++) {
 				//System.out.println(keys[i]+" "+key);
+				if(keys[i]!=null)
 				if(keys[i].compareTo(key)>0) {
 					
 					Ref ref=tito.search((T)keys[i]);

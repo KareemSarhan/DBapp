@@ -184,6 +184,7 @@ public class DBApp <T extends Comparable<T>> {
 
   // gets the pages references of a table
   
+  
   public static Vector deserilizetable(String tblname) {
     Vector result = new Vector();
     try {
@@ -208,6 +209,8 @@ public class DBApp <T extends Comparable<T>> {
 
   public void createTable(String strTableName, String strClusteringKeyColumn, Hashtable<String, String> htblColNameType)
       throws DBAppException, IOException {
+	  
+	  
     File myfile = new File("data/metadata.csv");
     boolean tablefound = false; // to check if the table is already there
     BufferedReader reader = null;
@@ -231,8 +234,11 @@ public class DBApp <T extends Comparable<T>> {
         // we need to know which one is the primary key of the table
         // we need to know if its indexed or not(by default they are all not indexed
         // will use this to iterate through hash map D:
+    	  
         BufferedWriter writer = new BufferedWriter(new FileWriter(myfile, true));
+        
         // first we will add the cluster key
+        
         String keyName = strClusteringKeyColumn;
         String keyType = htblColNameType.get(keyName);
         String ki = strTableName + "," + keyName + "," + keyType + "," + "True" + "," + "False" + "\n";
@@ -1164,7 +1170,7 @@ public class DBApp <T extends Comparable<T>> {
 	    {
 	    	if((boolean)table.getIsindexed().get(i)==true)
 	    	{
-	    		if(table.getDatatype().get(i).equals("Java.awt.Polygon"))
+	    		if(table.getDatatype().get(i).equals("java.awt.Polygon"))
 	    		{
 	    			this.refreshRTree(table.getName(), (String) table.getColoumn_names().get(i));
 	    		}
@@ -1182,6 +1188,7 @@ public class DBApp <T extends Comparable<T>> {
   public static List<String> deserilizetableOLD(String tblname) {
     try {
       // System.out.println("testo.txt");
+    
       ObjectInputStream o = new ObjectInputStream(new FileInputStream(tblname + ".bin"));
       Table foo2 = (Table) o.readObject();
       // System.out.print(foo2.getPagesreferences().get(0));
