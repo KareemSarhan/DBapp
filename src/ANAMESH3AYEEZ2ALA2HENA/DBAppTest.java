@@ -45,19 +45,19 @@ public class DBAppTest {
 		// htblColNameValue.put("name", new String("b" ) );
 		// htblColNameValue.put("area", new String("(12,0),(35,0),(40,0),(0,36)") );
 		// dbApp.insertIntoTable(strTableName, htblColNameValue);
-		htblColNameValue = new Hashtable();
+		// htblColNameValue = new Hashtable();
 		// htblColNameValue.put("id", new Integer(4 ));
 		// htblColNameValue.put("name", new String("d" ) );
-		htblColNameValue.put("area", new String("(0,0),(0,0),(-400,0),(0,36)") );
+		// htblColNameValue.put("area", new String("(0,0),(0,0),(-400,0),(0,36)") );
 		// dbApp.insertIntoTable(strTableName, htblColNameValue);
 		// htblColNameValue = new Hashtable();
 		// htblColNameValue.put("id", new Integer(7));
 		// htblColNameValue.put("name", new String("miro" + 3));
 		// htblColNameValue.put("area", new String("(0,0),(0,0),(0,0),(0,0)"));
-		// htblColNameValue = new Hashtable();
+		htblColNameValue = new Hashtable();
 		// htblColNameValue.put("id", new Integer(1));
 		// htblColNameValue.put("name", new String("c"));
-		// htblColNameValue.put("area", new String("(12,0),(35,0),(40,0),(0,36)"));
+		htblColNameValue.put("area", new String("(12,0),(35,0),(40,0),(0,36)"));
 		// dbApp.insertIntoTable(strTableName, htblColNameValue);
 		// dbApp.createBTreeIndex(strTableName, "id");
 		dbApp.deleteFromTable(strTableName, htblColNameValue);
@@ -87,7 +87,7 @@ public class DBAppTest {
 		htblColNameType.put("id", "java.lang.Integer");
 		htblColNameType.put("name", "java.lang.String");
 		htblColNameType.put("area", "java.awt.Polygon");
-		dbApp.createTable(strTableName, "area", htblColNameType);
+		dbApp.createTable(strTableName, "id", htblColNameType);
 	}
 	// public static<T extends Comparable<T>> void main(String[] args) throws
 	// Exception {
