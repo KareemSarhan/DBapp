@@ -1075,62 +1075,197 @@ public class DBApp<T extends Comparable<T>> {
 
 	public void updateTable(String strTableName, String strKey, Hashtable<String, Object> htblColNameValue)
 			throws Exception {
-		/*
-		 * bos yasta enta lama betgigi te update betecheck 3ala column tab3an we betgib
-		 * el values
+		System.out.println("hna");
+		Table table = this.loadTable(strTableName);
+		if(table.getIsindexed().get(0)) {
+			if((table.getDatatype().get(0)).equals("java.awt.Polygon")) {
+				updateTableWithRIndex(strTableName, strKey, htblColNameValue);
+				System.out.println("hna 1");
+			}
+			else {
+				System.out.println("hna2");
+				updateTableWithBPIndex(strTableName, strKey, htblColNameValue);
+			}
+		}
+		else
+			updateTableNoIndex(strTableName, strKey, htblColNameValue);
+	}
+	public void updateTableWithRIndex(String strTableName, String strKey, Hashtable<String, Object> htblColNameValue)
+			throws Exception{
+		System.out.println(getPolyArea(strKey));
+		//		System.out.println(getPolyArea("(-5,0),(0,0),(40,0),(0,36)"));
+		//		System.out.println(getPolyArea("(0,0),(0,0),(-400,0),(0,36)"));
+		//		System.out.println(getPolyArea("(-6,-8),(0,0),(406,0),(-63,36)"));
+		System.out.println("here R");
+		Table table = this.loadTable(strTableName);
+		RTree<T> tree=(RTree<T>)getRTree(strTableName, table.getColoumn_names().get(0));
+		Vector<Vector<Integer>> t=tree.searchAll((T)new Integer(getPolyArea(strKey)));
+		System.out.println(t);
+	}
+	public void updateTableWithBPIndex(String strTableName, String strKey, Hashtable<String, Object> htblColNameValue)
+			throws Exception{
+		System.out.println("here BP");
+		Table table = this.loadTable(strTableName);
+		table.setPagesreferences(this.deserilizetableOLD(strTableName));
+		BPTree<T> tree=(BPTree<T>)getBPlusTree(strTableName, table.getColoumn_names().get(0));
+		Vector<Vector<Integer>> t=tree.searchAll((T)new Integer(Integer.parseInt(strKey)));
+		System.out.println(table.getPagesreferences().size());
+
+
+		//first we formulate the new record to be able to update the old record
+
+		Hashtable<String, Object> tempT = new Hashtable();
+		for (int i = 0; i < table.getColoumn_names().size(); i++) {
+			if (htblColNameValue.containsKey(table.getColoumn_names().get(i))) {
+				tempT.put(table.getColoumn_names().get(i), htblColNameValue.get(table.getColoumn_names().get(i)));
+			} else {
+				tempT.put(table.getColoumn_names().get(i), "");
+			}
+		}
+		//		System.out.println(tempT);
+		Vector newRecord = new Vector();
+		for (int i = 0; i < table.getIskey().size() - 1; i++) {
+			if (table.getIskey().get(i) == true) {
+				newRecord.add(tempT.get(table.getColoumn_names().get(i)));
+				break;
+			}
+		}
+		for (int i = 0; i < table.getIskey().size() - 1; i++) {
+			if (table.getIskey().get(i) == false) {
+				newRecord.add(tempT.get(table.getColoumn_names().get(i)));
+			}
+		}
+		System.out.println(newRecord);
+		//----------------------------------------------------------------------------------------------------------
+		//now we have the new Record with the right format
+		Vector oldRecord=new Vector();
+		for(int i=0;i<t.size();i++) {
+			Vector <Integer> index=t.get(i);
+			System.out.println(this.getNumberOfRecords(strTableName));
+
+			oldRecord = (Vector) (table.read_page((table.getPagesreferences().get(index.get(0))))).RecordsGetter().get(index.get(1));
+			table.removefromtable(oldRecord);//est5dm delete from table wa 7ot el record fe hashtable
+
+			System.out.println(this.getNumberOfRecords(strTableName));
+			System.out.print("Deleted Record :    ");
+			this.recordDisplayer(oldRecord);
+			for (int k = 0; k < newRecord.size(); k++) {
+				// we only change the changed or the entered columns to avoid nulls
+				if (newRecord.get(k) == "") {
+					continue;
+				} else {
+					if(newRecord.get(k) instanceof String) {
+						if (isPolygon((String) newRecord.get(k))) {
+							// we modify the old record
+							Polygon newP = makePolygon((String) newRecord.get(k));
+							oldRecord.set(k, newP);
+
+
+							//						System.out.println("hna");
+						}
+						else {
+							oldRecord.set(k, newRecord.get(k));
+							table.update();
+						}
+					}
+					else {
+						oldRecord.set(k, newRecord.get(k));
+//						table.update();
+					}
+				}
+
+//				table.update();
+			}
+//			table.update();
+			table.inserttotable(oldRecord);
+		}
+		for(int i=0;i<table.getIsindexed().size();i++)
+		{
+			if((boolean)table.getIsindexed().get(i)==true)
+			{
+				if(table.getDatatype().get(i).equals("Java.awt.Polygon"))
+				{
+					this.refreshRTree(table.getName(), (String) table.getColoumn_names().get(i));
+					//					System.out.println("hna "+table.getDatatype().get(i));
+				}
+				else
+				{
+					this.refreshBTree(table.getName(), (String) table.getColoumn_names().get(i));
+					//					System.out.println("hna "+table.getDatatype().get(i));
+				}
+			}
+		}
+
+	}
+	public int getNumberOfRecords(String strTableName) throws DBAppException {
+		Table table=this.loadTable(strTableName);
+		table.setPagesreferences(this.deserilizetableOLD(strTableName));
+		int size=0;
+		//		System.out.println(table.getPagesreferences().size());
+		for(int i=0;i<table.getPagesreferences().size();i++) {
+			Page currentPage=table.read_page(table.getPagesreferences().get(i));
+			size+=currentPage.RecordsGetter().size();
+			//			System.out.println(currentPage);
+		}
+		//		System.out.println(size);
+		return size;
+	}
+	public void updateTableNoIndex(String strTableName, String strKey, Hashtable<String, Object> htblColNameValue)
+			throws Exception {
+		/*bos yasta enta lama betgigi te update betecheck 3ala  column tab3an we betgib el values
 		 * 
-		 * el haitghaiar howa enak lazem teshof el awel el column da indexed wala mesh
-		 * indexed ya3ni 3ando tree wala la2 law ah fa enta hatro7 tegib el tree beta3to
-		 * we te3mel search biha tab3an hat2oli ezai ha2olak awalan lazem teb2a 3aref
-		 * type el column ya3ni Integer wala Double wala eh bezabt now ma3ak el type hat
-		 * create tree keda BPTree<Integer> tree;
-		 * 
-		 * now enta 3awz el tree beta3tak teb2a zayi el tree el fel memory fa hate3mel
-		 * gettree method tree=getBPlusTree(strTableName, strColName)
-		 * 
-		 * BUT fi 7aga el method di betraga3 object fa hate3melha type cast le type el
-		 * tree beta3tak tree=getBPlusTree(strTableName, strColName);
-		 * 
-		 * keda enta ma3ak el tree delwa2ti 3awz tegib el records el maslan 3andohom id
-		 * 3
-		 * 
-		 * Vector<Vector<Integer>>=tree.searchAll(new Integer(3));
-		 * 
-		 * da hairaga3lak el indexes beta3t kol el records el fel tree el be 3 bel
-		 * manzar da record record record [ [page number,index in page], [page
-		 * number,index in page], [page number,index in page] ]
-		 * 
-		 * [ [2,3],[2,5],[3,4] ]
-		 * 
-		 * ya3ni hatro7 array page refrences we tegeib refrences.get(page number) haidik
-		 * el page el fiha awel record ba3d keda hate3mel men el page .get(index in
-		 * page) hairaga3lak el record bezabt
-		 * 
-		 * tab3an lazem ta5od balak men el diffrent types we en el tree beteb2a 3ala
-		 * column wa7ed mesh 3al table kolo we momken columns yeb2a liha tree we momken
-		 * la2 plz test carefully 3ashan 3aleha daragat ketir
-		 * 
-		 * ba3d ma teupdate records beta3t column mo3aian plz et2aked hal el column da
-		 * isIndexed? 3ashan law ah yeb2a howa 3ando bplus tree lazem tetghayar ma3ah fa
-		 * hat call refreshBTree(String strTableName, String strColName)
-		 * 
-		 * 
-		 * 7awel bas plz te test el tree lewa7daha abl ai 7aga we tefham heia
-		 * betraga3lak eh we te3melo print we keda heia el donia sahla fel trees el
-		 * mohem bas enak testa3mel amaken el records menaha we law ghayart ay column
-		 * teshof law indexed ghayar el tree beta3to law la2 yeb2a 5alas dont change
-		 * 
-		 * we by the ay lazem tezawed el 7eta di fel linear search bardo ya3ni ba3d ma
-		 * teupdate kol column zawed ta7tih checks men el table calss en law el column
-		 * da indexed hat call refresh Bplustree
-		 * 
-		 * 
-		 * 
-		 * if its a polygon dont create b+tree we will implement the R tree in that case
-		 * so just put a comment //create r tree
-		 * 
-		 * 
+	    el haitghaiar howa enak lazem teshof el awel el column da indexed wala mesh indexed ya3ni
+	    3ando tree wala la2 law ah fa enta hatro7 tegib el tree beta3to we te3mel search biha
+	    tab3an hat2oli ezai ha2olak 
+	    awalan lazem teb2a 3aref type el column ya3ni Integer wala Double wala eh bezabt
+	    now ma3ak el type hat create tree keda
+	    BPTree<Integer> tree;
+
+	    now enta 3awz el tree beta3tak teb2a zayi el tree el fel memory fa hate3mel gettree method
+	    tree=getBPlusTree(strTableName, strColName)
+
+	    BUT fi 7aga el method di betraga3 object fa hate3melha type cast le type el tree beta3tak
+	    tree=getBPlusTree(strTableName, strColName);
+
+	    keda enta ma3ak el tree delwa2ti 3awz tegib el records el maslan 3andohom id 3
+
+	    Vector<Vector<Integer>>=tree.searchAll(new Integer(3));
+
+	    da hairaga3lak el indexes beta3t kol el records el fel tree el be 3 bel manzar da
+	    	record                          record                          record
+	    [ [page number,index in page], [page number,index in page], [page number,index in page] ]
+
+	    [ [2,3],[2,5],[3,4] ]
+
+	    ya3ni hatro7 array page refrences we tegeib refrences.get(page number) haidik el page el fiha awel record
+	    ba3d keda hate3mel men el page .get(index in page) hairaga3lak el record bezabt
+
+	    tab3an lazem ta5od balak men el diffrent types we en el tree beteb2a 3ala column wa7ed mesh 3al table kolo
+	    we momken columns yeb2a liha tree we momken la2 plz test carefully 3ashan 3aleha daragat ketir
+
+	    ba3d ma teupdate records beta3t column mo3aian plz et2aked
+	    hal el column da isIndexed? 3ashan law ah yeb2a howa 3ando bplus tree lazem tetghayar ma3ah
+	    fa hat call refreshBTree(String strTableName, String strColName)
+
+
+	    7awel bas plz te test el tree lewa7daha abl ai 7aga we tefham heia betraga3lak eh we te3melo print we 
+	    keda heia el donia sahla fel trees el mohem bas enak testa3mel amaken el records menaha we law
+	    ghayart ay column teshof law indexed ghayar el tree beta3to law la2 yeb2a 5alas dont change
+
+	    we by the ay lazem tezawed el 7eta di fel linear search bardo ya3ni ba3d ma teupdate kol column
+	    zawed ta7tih checks men el table calss en law el column da indexed hat call refresh Bplustree
+
+
+
+	  	if its a polygon dont create b+tree we will implement the R tree in that case so just put a comment
+	  	//create r tree
+
+
 		 */
+
+
+
+
 
 		Table table = this.loadTable(strTableName);
 		table.setPagesreferences(this.deserilizetableOLD(strTableName));
@@ -1180,11 +1315,11 @@ public class DBApp<T extends Comparable<T>> {
 						Polygon s = makePolygon(strKey);
 						makeString(s);
 						System.out.println();
-						makeString((Polygon) temp.get(0));
+//						makeString((Polygon) temp.get(0));
 						System.out.println("");
-						System.out.println(polygonCompare(s, (Polygon) temp.get(0)));
+//						System.out.println(polygonCompare(s, (Polygon) temp.get(0)));
 
-						if (polygonCompare(s, (Polygon) temp.get(0)) == 0) {
+						if (s.equals(temp.get(0))) {
 							table.removefromtable(temp);
 
 							System.out.println("j :- " + j);
@@ -1201,6 +1336,7 @@ public class DBApp<T extends Comparable<T>> {
 										Polygon newP = makePolygon((String) newRecord.get(k));
 										temp.set(k, newP);
 
+
 										System.out.println("hna");
 									} else
 										temp.set(k, newRecord.get(k));
@@ -1216,6 +1352,7 @@ public class DBApp<T extends Comparable<T>> {
 						}
 						continue;
 					}
+
 
 					if ((temp.get(0).toString()).equals(strKey)) {
 						// here we found the targeted record so we remove it form the record

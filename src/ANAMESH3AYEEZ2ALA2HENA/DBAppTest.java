@@ -12,56 +12,78 @@ import RTree.RTree;
 
 public class DBAppTest {
 	public static void main(String[] args) throws Exception {
-		String strTableName = "delete";
+		String strTableName = "test";
 		DBApp dbApp = new DBApp();
 		dbApp.init();
-		// createtablemain(dbApp, strTableName);
-		// deletemain();
-		// dbApp.displayer("delete");
-		// dbApp.createRTreeIndex(strTableName, "area");
-		Hashtable htblColNameValue;
-		// htblColNameValue = new Hashtable();
-		// htblColNameValue.put("id", new Integer(5));
-		// htblColNameValue.put("name", new String("miro" + 3));
-		// htblColNameValue.put("area", new String("(0,0),(0,0),(0,0),(0,0)"));
-		// dbApp.insertIntoTable(strTableName, htblColNameValue);
-		// htblColNameValue = new Hashtable();
-		// htblColNameValue.put("id", 13);
-		// htblColNameValue.put("name", new String("miro" + 13));
-		// htblColNameValue.put("area", new String("(0,0),(0,0),(0,0),(0,0)"));
-		// dbApp.insertIntoTable(strTableName, htblColNameValue);
-		// htblColNameValue = new Hashtable();
-		// htblColNameValue.put("id", new Integer(3));
-		// htblColNameValue.put("name", new String("c"));
-		// htblColNameValue.put("area", new String("(-5,0),(0,0),(40,0),(0,36)"));
-		// dbApp.insertIntoTable(strTableName, htblColNameValue);
-		// htblColNameValue = new Hashtable();
-		// htblColNameValue.put("id", new Integer( 1));
-		// htblColNameValue.put("name", new String("a" ) );
-		// htblColNameValue.put("area", new String("(0,0),(0,0),(-400,0),(0,36)") );
-		// dbApp.insertIntoTable(strTableName, htblColNameValue);
-		// htblColNameValue = new Hashtable();
-		// htblColNameValue.put("id", new Integer( 2 ));
-		// htblColNameValue.put("name", new String("b" ) );
-		// htblColNameValue.put("area", new String("(12,0),(35,0),(40,0),(0,36)") );
-		// dbApp.insertIntoTable(strTableName, htblColNameValue);
-		// htblColNameValue = new Hashtable();
-		// htblColNameValue.put("id", new Integer(4 ));
-		// htblColNameValue.put("name", new String("d" ) );
-		// htblColNameValue.put("area", new String("(0,0),(0,0),(-400,0),(0,36)") );
-		// dbApp.insertIntoTable(strTableName, htblColNameValue);
-		// htblColNameValue = new Hashtable();
-		// htblColNameValue.put("id", new Integer(7));
-		// htblColNameValue.put("name", new String("miro" + 3));
-		// htblColNameValue.put("area", new String("(0,0),(0,0),(0,0),(0,0)"));
-		htblColNameValue = new Hashtable();
-		// htblColNameValue.put("id", new Integer(1));
-		// htblColNameValue.put("name", new String("c"));
-		htblColNameValue.put("area", new String("(12,0),(35,0),(40,0),(0,36)"));
-		// dbApp.insertIntoTable(strTableName, htblColNameValue);
-		// dbApp.createBTreeIndex(strTableName, "id");
-		dbApp.deleteFromTable(strTableName, htblColNameValue);
-		dbApp.displayer("delete");
+
+		Hashtable htblColNameType = new Hashtable();
+		htblColNameType.put("id", "java.lang.Integer");
+		htblColNameType.put("name", "java.lang.String");
+		htblColNameType.put("area", "java.awt.Polygon");
+		
+//		dbApp.createTable(strTableName, "id", htblColNameType);
+		
+//		dbApp.createBTreeIndex(strTableName, "id");
+//		dbApp.createRTreeIndex(strTableName, "area");
+
+
+		 Hashtable htblColNameValue;
+//		 for(int i=0;i<100;i++) {
+//			 htblColNameValue.put("id", new Integer(i));
+//			 htblColNameValue.put("name", new String("a"+i));
+//			 htblColNameValue.put("area", new String("("+(i*i)+","+i+"),("+(i+1)+",0),("+(i-1)+",0),("+(-i)+","+(i*2)+")"));
+//			 dbApp.insertIntoTable(strTableName, htblColNameValue);
+//		 }
+		 
+		 htblColNameValue=new Hashtable();
+//		 htblColNameValue.put("id", new Integer(3));
+//		 htblColNameValue.put("name", new String("c"));
+//		 htblColNameValue.put("area", new String("(-5,0),(0,0),(40,0),(0,36)"));
+//		 dbApp.insertIntoTable(strTableName, htblColNameValue);
+//		 htblColNameValue=new Hashtable();
+//		 htblColNameValue.put("id", new Integer( 1));
+//		 htblColNameValue.put("name", new String("a" ) );
+//		 htblColNameValue.put("area", new String("(0,0),(0,0),(-400,0),(0,36)") );
+//		 dbApp.insertIntoTable(strTableName, htblColNameValue);
+//		  htblColNameValue=new Hashtable();
+//		 htblColNameValue.put("id", new Integer( 2 ));
+//		 htblColNameValue.put("name", new String("b" ) );
+//		 htblColNameValue.put("area", new String("(12,0),(35,0),(40,0),(0,36)") );
+//		 dbApp.insertIntoTable(strTableName, htblColNameValue);
+//		 htblColNameValue=new Hashtable();
+//		 htblColNameValue.put("id", new Integer(4 ));
+//		 htblColNameValue.put("name", new String("d" ) );
+//		 htblColNameValue.put("area", new String("(-6,-8),(0,0),(406,0),(-63,36)") );
+//		 dbApp.insertIntoTable(strTableName, htblColNameValue);
+//		 htblColNameValue.put("id", new Integer(7));
+//         htblColNameValue.put("name", new String("miro" + 3));
+//        htblColNameValue.put("area", new String("(0,0),(0,0),(0,0),(0,0)"));
+		
+//		 dbApp.insertIntoTable(strTableName, htblColNameValue);
+		 
+//		 htblColNameValue.put("id", new Integer(1000 ) );
+		 htblColNameValue.put("name", new String("h" ) );
+		 htblColNameValue.put("area", new String("(0,0),(0,34),(0,0),(0,0)"));
+		  
+		 
+		 dbApp.updateTable("test", "3", htblColNameValue);;
+//		 System.out.println(dbApp.getNumberOfRecords(strTableName));
+//		 System.out.println( dbApp.canBTreeIndex("gay","area")); //hairaga3 true
+//		 dbApp.deleteFromTable(strTableName, htblColNameValue);
+		 dbApp.displayer("test");
+//		 dbApp.deleteFromTable(strTableName, htblColNameValue);
+		// dbApp.csvIndex("gay","area");//hai5alih indexed
+		// String p1="(0,0),(35,0),(4,0),(0,36)";
+		// String p2="(12,0),(35,0),(40,0),(0,36)";
+		// dbApp.polygonCompare(p1, p2);
+
+		// System.out.println( dbApp.canBTreeIndex("gay","area")); //hairaga3 exception
+
+		// htblColNameValue.clear( );
+		// htblColNameValue.put("id", new Integer( 453455 ));
+		// htblColNameValue.put("name", new String("Ahmed Noor" ) );
+		// htblColNameValue.put("gpa", new Double( 0.95 ) );
+		// dbApp.insertIntoTable( strTableName , htblColNameValue );
 	}
 
 	private static void deletemain() throws Exception {
