@@ -319,8 +319,7 @@ public class Table implements Serializable {
 		Vector out = new Vector<String>();
 		for (int i = 0; i < this.pagesreferences.size(); i++) {
 			Page page = this.read_page(this.pagesreferences.get(i));
-			System.err.println(page.delete(record, this.getIsindexed(), i, this));
-
+			page.delete(record);
 			if (page.RecordsGetter().isEmpty()) {
 				out.add(page.getPath());
 				this.pagesreferences.remove(i);
@@ -332,14 +331,16 @@ public class Table implements Serializable {
 		return out;
 	}
 
-	public void removeindfromtable(Vector<Object> dellrecord, Vector<Integer> record)
+	public boolean removeindfromtable(Vector<Object> dellrecord, Vector<Integer> recordlocation)
 			throws IOException, DBAppException {
-		Page page = this.read_page(this.pagesreferences.get(record.get(0)));
-		page.deleteind(dellrecord, record.get(1));
+				boolean flag = false;
+		Page page = this.read_page(this.pagesreferences.get(recordlocation.get(0)));
+		flag =  page.deleteind(dellrecord, recordlocation.get(1));
 		if (page.RecordsGetter().isEmpty()) {
-			this.pagesreferences.remove(record.get(0));
+			this.pagesreferences.remove(recordlocation.get(0));
 		}
 		this.update();
+		return flag;
 	}
 
 	public static void main(String[] args) throws Exception {
